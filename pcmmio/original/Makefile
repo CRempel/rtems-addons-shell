@@ -1,68 +1,30 @@
-# $Header$
 #
-# $Id$
-#
-# $Log$
+#  $Id$
 #
 
-MAJOR = 115
+RTEMS_MAKEFILE_PATH=/home/joel/rtems-4.10-work/bsp-install/i386-rtems4.10/pc386/
+#
+#  RTEMS_MAKEFILE_PATH is typically set in an environment variable
+#
 
-CFLAGS += -DMAJOR_NUM=$(MAJOR)
+MAINS= buffered.c # dacbuff.c dacout.c flash.c getall.c getvolt.c poll.c repeat.c
 
-# Test Makefile
+PGMS=$(MAINS:%.c=${ARCH}/%.exe)
 
-ifneq ($(KERNELRELEASE),)
-	obj-m := pcmmio.o
-else
-	KERNELDIR ?= /lib/modules/$(shell uname -r)/build
-	PWD := $(shell pwd)
+# optional managers required
+MANAGERS=all
 
-default:
-	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
-endif
+# C source names
+SHARED_CSRCS = rtems_config.c mio_io.c kbhit.c
+SHARED_COBJS = $(SHARED_CSRCS:%.c=${ARCH}/%.o)
 
-mio_io.o: mio_io.c mio_io.h Makefile
-	gcc -c $(CFLAGS) mio_io.c
+include $(RTEMS_MAKEFILE_PATH)/Makefile.inc
+include $(RTEMS_CUSTOM)
+include $(PROJECT_ROOT)/make/leaf.cfg
 
-nodes:
-	mknod pcmmio c $(MAJOR) 0
-	chmod a+rw pcmmio
+OBJS= $(COBJS) $(CXXOBJS) $(ASOBJS)
 
-all:    default nodes poll flash getvolt dacout getall repeat buffered dacbuff
+all:    ${ARCH} $(SHARED_COBJS) $(PGMS)
 
-dacbuff: dacbuff.c mio_io.o mio_io.h Makefile kbhit.c
-	gcc $(CFLAGS) -static dacbuff.c kbhit.c mio_io.o -o dacbuff
-	chmod a+x dacbuff
-	
-buffered: buffered.c mio_io.o mio_io.h Makefile kbhit.c
-	gcc $(CFLAGS) -static buffered.c kbhit.c mio_io.o -o buffered
-	chmod a+x buffered
-	
-repeat: repeat.c mio_io.o mio_io.h Makefile kbhit.c
-	gcc $(CFLAGS) -D_REENTRANT -static repeat.c kbhit.c mio_io.o -o repeat -lpthread
-	chmod a+x repeat
-
-flash: flash.c mio_io.h kbhit.c mio_io.o Makefile
-	gcc $(CFLAGS) -static flash.c kbhit.c mio_io.o -o flash
-	chmod a+x flash
-
-getvolt: getvolt.c mio_io.h mio_io.o Makefile
-	gcc $(CFLAGS) -static getvolt.c mio_io.o -o getvolt
-	chmod a+x getvolt
-
-getall: getall.c mio_io.h mio_io.o Makefile
-	gcc $(CFLAGS) -static getall.c mio_io.o -o getall
-	chmod a+x getall
-
-dacout: dacout.c mio_io.h mio_io.o Makefile
-	gcc $(CFLAGS) -static dacout.c mio_io.o -o dacout
-	chmod a+x dacout
-
-poll:  poll.c mio_io.o mio_io.h Makefile
-	gcc $(CFLAGS) -D_REENTRANT -static poll.c mio_io.o -o poll -lpthread
-	chmod a+x poll
- 
-clean:
-	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions pcmmio
-
-
+${ARCH}/%.exe: %.c
+	$(CC) -o $@ $< $(SHARED_COBJS)

@@ -7,13 +7,19 @@
  */
 
 /* $Log$
-*
-*/
+ * Revision 1.1.1.1  2009/06/08 14:52:43  joel
+ * Initial import.
+ */
 
 #ifndef CHARDEV_H
 #define CHARDEV_H
 
+#if defined(__linux__)
 #include <linux/ioctl.h> 
+#else
+#define MAJOR_NUM 1
+#define _IOWR(_x, _y, _t) (_t) ((_x << 16) | (_y << 16))
+#endif
 
 
 /* These are the IOCTL value the pcmmio driver recognizes */
@@ -185,45 +191,4 @@ int dio_get_int(void);
 int wait_adc_int(int adc_num);
 int wait_dac_int(int dac_num);
 int wait_dio_int(void);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

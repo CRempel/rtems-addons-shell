@@ -6,6 +6,9 @@
 *   $Id$
 *
 *   $Log$
+*   Revision 1.1.1.1  2009/06/08 14:52:43  joel
+*   Initial import.
+*
 *   Revision 1.1  2005/04/19 20:39:11  steve
 *   Initial revision
 *
@@ -23,8 +26,10 @@
 
 #include <stdio.h>
 #include <termios.h>
+#if defined(__linux__)
 #include <term.h>
 #include <curses.h>
+#endif
 #include <unistd.h>
 
 static struct termios initial_settings, new_settings;

@@ -5,6 +5,9 @@
 *  $Id$
 *
 *  $Log$
+*  Revision 1.1.1.1  2009/06/08 14:52:43  joel
+*  Initial import.
+*
 *
 *  This file implements all of the supported 'C' language functions. Where necessary
 *  ioctl call are made into the kernel driver to access the actual hardware.
@@ -97,7 +100,7 @@ int disable_dio_interrupt(void)
 {
 	mio_error_code = MIO_SUCCESS;
 
-    if(check_handle())   /* Check for chip available */
+	if(check_handle())   /* Check for chip available */
 		return -1;
 
 	adc1_port_image = adc1_port_image | 0x10;
