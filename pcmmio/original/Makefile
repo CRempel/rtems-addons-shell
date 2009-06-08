@@ -16,6 +16,8 @@ MANAGERS=all
 
 # C source names
 SHARED_CSRCS = rtems_config.c mio_io.c kbhit.c
+SHARED_CSRCS += mio_io_linux.c
+
 SHARED_COBJS = $(SHARED_CSRCS:%.c=${ARCH}/%.o)
 
 include $(RTEMS_MAKEFILE_PATH)/Makefile.inc

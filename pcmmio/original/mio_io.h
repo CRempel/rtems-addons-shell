@@ -7,6 +7,13 @@
  */
 
 /* $Log$
+ * Revision 1.2  2009/06/08 18:21:56  joel
+ * 2009-06-08	Joel Sherrill <joel.sherrill@oarcorp.com>
+ *
+ * 	* Makefile, kbhit.c, mio_io.c, mio_io.h: First successful compilation
+ * 	under RTEMS. Added some Linux ifdef's.
+ * 	* rtems_config.c: New file.
+ *
  * Revision 1.1.1.1  2009/06/08 14:52:43  joel
  * Initial import.
  */
@@ -123,12 +130,12 @@
 int mio_error_code;
 char mio_error_string[128];
 float adc_bitval[16] = {.00, .00, .00, .00, .00, .00, 00, .00,
-							   .00, .00, .00, .00, .00, .00, .00, .00 };
+		        .00, .00, .00, .00, .00, .00, .00, .00 };
 
 unsigned short adc_adjust[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
 float adc_offset[16] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-						 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+			 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
 #else
 
@@ -148,6 +155,9 @@ extern float adc_offset[16];
 
 #endif
 
+/* part of the porting layer */
+int check_handle(void);
+int mio_read_irq_assigned(void);
 
 int disable_dio_interrupt(void);
 int enable_dio_interrupt(void);
