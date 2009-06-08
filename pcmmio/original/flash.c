@@ -5,6 +5,9 @@
 *  $Id$
 *
 *  $Log$
+*  Revision 1.1.1.1  2009/06/08 14:52:43  joel
+*  Initial import.
+*
 *
 *
 *  Compile with :
@@ -27,6 +30,7 @@ int readch(void);
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include "mio_io.h"
 

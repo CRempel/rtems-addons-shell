@@ -1,5 +1,11 @@
 2009-06-08	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* Makefile, flash.c, mio_io.h: All programs now compile with the copied
+	RTEMS specific porting layer file.
+	* .cvsignore, mio_io_rtems.c: New files.
+
+2009-06-08	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* Makefile, mio_io.c, mio_io.h: Linux code split to porting file.
 	* mio_io_linux.c: New file.
 

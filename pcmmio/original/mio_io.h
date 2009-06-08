@@ -6,17 +6,7 @@
  * (ioctl.c)
  */
 
-/* $Log$
- * Revision 1.2  2009/06/08 18:21:56  joel
- * 2009-06-08	Joel Sherrill <joel.sherrill@oarcorp.com>
- *
- * 	* Makefile, kbhit.c, mio_io.c, mio_io.h: First successful compilation
- * 	under RTEMS. Added some Linux ifdef's.
- * 	* rtems_config.c: New file.
- *
- * Revision 1.1.1.1  2009/06/08 14:52:43  joel
- * Initial import.
- */
+/* $Id$ */
 
 #ifndef CHARDEV_H
 #define CHARDEV_H
