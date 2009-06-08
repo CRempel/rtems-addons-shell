@@ -1,0 +1,11 @@
+#
+#  $Id$
+#
+
+This is a port of the Winsystems Linux driver to RTEMS.
+
+In general, the goal was to minimize changes to the user level
+library and only replace Linux IO calls to the device driver
+with direct access functions. 
+
+--joel sherrill

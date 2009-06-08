@@ -1,0 +1,71 @@
+# $Header$
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1.1.1  2009/06/08 14:52:43  joel
+# Initial import.
+#
+#
+
+MAJOR = 115
+
+CFLAGS += -DMAJOR_NUM=$(MAJOR)
+
+# Test Makefile
+
+ifneq ($(KERNELRELEASE),)
+	obj-m := pcmmio.o
+else
+	KERNELDIR ?= /lib/modules/$(shell uname -r)/build
+	PWD := $(shell pwd)
+
+default:
+	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
+endif
+
+mio_io.o: mio_io.c mio_io.h Makefile
+	gcc -c $(CFLAGS) mio_io.c
+
+nodes:
+	mknod pcmmio c $(MAJOR) 0
+	chmod a+rw pcmmio
+
+all:    default nodes poll flash getvolt dacout getall repeat buffered dacbuff
+
+dacbuff: dacbuff.c mio_io.o mio_io.h Makefile kbhit.c
+	gcc $(CFLAGS) -static dacbuff.c kbhit.c mio_io.o -o dacbuff
+	chmod a+x dacbuff
+	
+buffered: buffered.c mio_io.o mio_io.h Makefile kbhit.c
+	gcc $(CFLAGS) -static buffered.c kbhit.c mio_io.o -o buffered
+	chmod a+x buffered
+	
+repeat: repeat.c mio_io.o mio_io.h Makefile kbhit.c
+	gcc $(CFLAGS) -D_REENTRANT -static repeat.c kbhit.c mio_io.o -o repeat -lpthread
+	chmod a+x repeat
+
+flash: flash.c mio_io.h kbhit.c mio_io.o Makefile
+	gcc $(CFLAGS) -static flash.c kbhit.c mio_io.o -o flash
+	chmod a+x flash
+
+getvolt: getvolt.c mio_io.h mio_io.o Makefile
+	gcc $(CFLAGS) -static getvolt.c mio_io.o -o getvolt
+	chmod a+x getvolt
+
+getall: getall.c mio_io.h mio_io.o Makefile
+	gcc $(CFLAGS) -static getall.c mio_io.o -o getall
+	chmod a+x getall
+
+dacout: dacout.c mio_io.h mio_io.o Makefile
+	gcc $(CFLAGS) -static dacout.c mio_io.o -o dacout
+	chmod a+x dacout
+
+poll:  poll.c mio_io.o mio_io.h Makefile
+	gcc $(CFLAGS) -D_REENTRANT -static poll.c mio_io.o -o poll -lpthread
+	chmod a+x poll
+ 
+clean:
+	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions pcmmio
+
+
