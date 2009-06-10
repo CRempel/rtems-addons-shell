@@ -1,3 +1,7 @@
+2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* mio_io_rtems.c: Add checking for interrupt status.
+
 2009-06-08	Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* Makefile, flash.c, mio_io.h: All programs now compile with the copied
