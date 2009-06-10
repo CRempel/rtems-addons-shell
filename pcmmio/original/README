@@ -8,4 +8,17 @@ In general, the goal was to minimize changes to the user level
 library and only replace Linux IO calls to the device driver
 with direct access functions. 
 
+The driver uses 4 Classic API Barriers.
+
+
 --joel sherrill
+
+Issues
+======
++ The library is not reentrant. The GNU/Linux version uses global variables
+  to track the state of certain variables and access to these is not protected.
+  This design flaw is carried over into the RTEMS version.
+
++ We want to timestamp samples and the current code does not do that.
+
++ Need an RTEMS configuration.

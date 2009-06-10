@@ -1,5 +1,11 @@
 2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* README: Document state of the driver.
+	* mio_io.h, mio_io_rtems.c: Move to shared interrupts when possible.
+	* rtems_config.c: Implement the RTEMS configuration and initialization.
+
+2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* mio_io_rtems.c: Initial interrupt support added. Should now be on
 	functional parity with Linux driver but not debugged.
 

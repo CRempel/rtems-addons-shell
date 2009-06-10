@@ -192,3 +192,10 @@ int wait_adc_int(int adc_num);
 int wait_dac_int(int dac_num);
 int wait_dio_int(void);
 
+#if defined(__rtems__)
+  void pcmmio_initialize(
+    unsigned short _base_port,
+    unsigned short _irq
+  );
+#endif
+

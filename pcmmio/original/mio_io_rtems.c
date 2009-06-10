@@ -488,7 +488,12 @@ void pcmmio_initialize(
   /* install IRQ handler */
   if ( irq ) {
     pcmmio_irq.name = irq;
-    BSP_install_rtems_irq_handler( &pcmmio_irq );
+    #if defined(BSP_SHARED_HANDLER_SUPPORT)
+      BSP_install_rtems_shared_irq_handler( &pcmmio_irq );
+    #else
+      printk( "PCMMIO Installing IRQ handler as non-shared\n" );
+      BSP_install_rtems_irq_handler( &pcmmio_irq );
+    #endif
   }
 }
 
@@ -509,7 +514,8 @@ static unsigned char int_buffer[MAX_INTS];
 static int inptr = 0;
 static int outptr = 0;
 
-static unsigned char adc2_port_image;
+/* real copy is in mio_io.c */
+extern unsigned char adc2_port_image;
 
 /* This is the common interrupt handler. It is called by the
  * actual hardware ISR.
@@ -672,7 +678,7 @@ int get_int(void)
     }
   }
 
-  /* Lastly, read the statur of port 2 interrupt ID register */
+  /* Lastly, read the status of port 2 interrupt ID register */
   temp = inb(dio_port+0x0a);
 
   /* If any pending, return the appropriate bit number */
