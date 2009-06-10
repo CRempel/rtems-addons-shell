@@ -446,6 +446,28 @@ void wake_up_interruptible(
 }
 
 /*
+ *  RTEMS specific interrupt handler
+ */
+#include <bsp/irq.h>
+
+void common_handler(void);
+
+void pcmmio_interrupt_handler(
+  rtems_irq_hdl_param param
+)
+{
+}
+
+rtems_irq_connect_data pcmmio_irq = {
+  0,                            // name
+  pcmmio_interrupt_handler,     // handler
+  NULL,                         // parameter
+  NULL,                         // enable IRQ
+  NULL,                         // disable IRQ
+  NULL,                         // is IRQ enabled
+};
+
+/*
  * RTEMS specific initialization routine
  */
 void pcmmio_initialize(
@@ -462,6 +484,12 @@ void pcmmio_initialize(
   pcmmio_barrier_create( rtems_build_name( 'd', 'a', 'c', '1' ), &wq_dac_1 );
   pcmmio_barrier_create( rtems_build_name( 'd', 'a', 'c', '2' ), &wq_dac_2 );
   pcmmio_barrier_create( rtems_build_name( 'd', 'i', 'o', ' ' ), &wq_dio );
+
+  /* install IRQ handler */
+  if ( irq ) {
+    pcmmio_irq.name = irq;
+    BSP_install_rtems_irq_handler( &pcmmio_irq );
+  }
 }
 
 
@@ -686,8 +714,3 @@ int get_buffered_int(void)
 
   return 0;
 }
-
-
-
-
-

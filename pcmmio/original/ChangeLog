@@ -1,5 +1,10 @@
 2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* mio_io_rtems.c: Initial interrupt support added. Should now be on
+	functional parity with Linux driver but not debugged.
+
+2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* mio_io_rtems.c: All Linux functionality should be implemented now
 	EXCEPT hooking the interrupt.
 
