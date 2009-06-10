@@ -14,11 +14,13 @@
 #include <fcntl.h>      /* open */ 
 #include <unistd.h>     /* exit */
 #include <sys/ioctl.h>  /* ioctl */
+#include <stdlib.h>     /* for exit */
 
+#include <rtems.h>
 #include <i386_io.h>
 
 /*
- *  These have to be configured SOMEHOW
+ *  These are configured by the initialization call.
  */
 
 /* IRQ source or 0 ==> polled */
@@ -26,21 +28,25 @@ static unsigned short irq = 0;
 /* This holds the base addresses of the board */
 static unsigned short base_port = 0;
 
-/* for RTEMS */
-void pcmmio_initialize(
-  unsigned short _base_port,
-  unsigned short _irq
-)
-{
-  base_port = _base_port;
-  irq       = _irq;
-}
-
 /* Function prototypes for local functions */
 int get_buffered_int(void);
 void init_io(unsigned short io_address);
 void clr_int(int bit_number);
 int get_int(void);
+
+/* RTEMS Ids for Wait Queues */
+rtems_id wq_a2d_1;
+rtems_id wq_a2d_2;
+rtems_id wq_dac_1;
+rtems_id wq_dac_2;
+rtems_id wq_dio;
+
+void interruptible_sleep_on(
+  rtems_id *id
+);
+void wake_up_interruptible(
+  rtems_id *id
+);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -325,57 +331,55 @@ int dio_get_int(void)
 
 }
 
-static int handle = 0; /* XXX move to lower */
-
-
 int wait_adc_int(int adc_num)
 {
-  int c;
-
   if (check_handle())   /* Check for chip available */
     return -1;
 
-  if (adc_num)
-      c=ioctl(handle,WAIT_A2D_INT_1,NULL);
-  else
-      c=ioctl(handle,WAIT_A2D_INT_2,NULL);
+  if (adc_num) {
+    interruptible_sleep_on(&wq_a2d_1);
+  } else {
+    interruptible_sleep_on(&wq_a2d_2);
+  }
 
-
-  return (c & 0xff);
-
+  return 0;
 }
 
 
 int wait_dac_int(int dac_num)
 {
-  int c;
-
   if (check_handle())   /* Check for chip available */
     return -1;
 
-  if (dac_num)
-      c=ioctl(handle,WAIT_DAC_INT_1,NULL);
-  else
-      c=ioctl(handle,WAIT_DAC_INT_2,NULL);
+  if (dac_num) {
+    interruptible_sleep_on(&wq_dac_1);
+  } else {
+    interruptible_sleep_on(&wq_dac_2);
+  }
 
-  return (c & 0xff);
-
+  return 0;
 }
 
 
 int wait_dio_int(void)
 {
-  int c;
+  int i;
 
   if (check_handle())   /* Check for chip available */
     return -1;
 
-  c=ioctl(handle,WAIT_DIO_INT,NULL);
+  if((i = get_buffered_int()))
+    return i;
 
-  return (c & 0xff);
+  interruptible_sleep_on(&wq_dio);
 
+  i = get_buffered_int();
+
+  return i;
 }
 
+
+static int handle = 0; /* XXX move to lower */
 
 int check_handle(void)
 {
@@ -404,6 +408,62 @@ int check_handle(void)
   return -1;
 }
 
+/*
+ *  RTEMS barrier create helper
+ */
+void pcmmio_barrier_create(
+  rtems_name  name,
+  rtems_id   *id
+)
+{
+  rtems_status_code rc;
+
+  rc = rtems_barrier_create( name, RTEMS_BARRIER_MANUAL_RELEASE, 0, id );
+  if ( rc == RTEMS_SUCCESSFUL )
+    return;
+
+ printk( "Unable to create PCMMIO Barrier\n" );
+ exit(1);
+}
+
+void interruptible_sleep_on(
+  rtems_id *id
+)
+{
+  rtems_status_code rc;
+
+  rc = rtems_barrier_wait(*id, 0);
+}
+
+void wake_up_interruptible(
+  rtems_id *id
+)
+{
+  rtems_status_code rc;
+  uint32_t          unblocked;
+
+  rc = rtems_barrier_release(*id, &unblocked);
+}
+
+/*
+ * RTEMS specific initialization routine
+ */
+void pcmmio_initialize(
+  unsigned short _base_port,
+  unsigned short _irq
+)
+{
+  /* hardware configuration information */
+  base_port = _base_port;
+  irq       = _irq;
+
+  /* Create RTEMS Objects */
+  pcmmio_barrier_create( rtems_build_name( 'a', '2', 'd', '1' ), &wq_a2d_1 );
+  pcmmio_barrier_create( rtems_build_name( 'd', 'a', 'c', '1' ), &wq_dac_1 );
+  pcmmio_barrier_create( rtems_build_name( 'd', 'a', 'c', '2' ), &wq_dac_2 );
+  pcmmio_barrier_create( rtems_build_name( 'd', 'i', 'o', ' ' ), &wq_dio );
+}
+
 
 /*
  *  From this point down, we should be able to share easily with the Linux
@@ -420,6 +480,84 @@ int check_handle(void)
 static unsigned char int_buffer[MAX_INTS];
 static int inptr = 0;
 static int outptr = 0;
+
+static unsigned char adc2_port_image;
+
+/* This is the common interrupt handler. It is called by the
+ * actual hardware ISR.
+ */
+
+void common_handler(void)
+{
+  unsigned char status;
+  unsigned char int_num;
+
+  /* Read the interrupt ID register from ADC2 */
+
+  adc2_port_image = adc2_port_image | 0x20;
+  outb(adc2_port_image,base_port + 0x0f);
+
+  status = inb(base_port + 0x0f);
+  if (status & 1) {
+    /* Clear ADC1 interrupt */
+    inb(base_port+1);      /* Clear interrupt */
+
+    /* Wake up any holding processes */
+    wake_up_interruptible(&wq_a2d_1);
+  }
+
+  if (status & 2) {
+    /* Clear ADC1 interrupt */
+    inb(base_port+5);      /* Clear interrupt */
+
+    /* Wake up anybody waiting for ADC1 */
+    wake_up_interruptible(&wq_a2d_2);
+  }
+
+  if (status & 4) {
+    /* Clear DAC1 interrupt */
+    inb(base_port+9);    /* Clear interrupt */
+
+    /* Wake up if you're waiting on DAC1 */
+    wake_up_interruptible(&wq_dac_1);
+  }
+
+  if (status & 8) {
+
+    /* DIO interrupt. Find out which bit */
+    int_num = get_int();
+    if (int_num) {
+      #ifdef DEBUG
+        printk("<1>Buffering DIO interrupt on bit %d\n",int_num);
+      #endif
+
+      /* Buffer the interrupt */
+
+      int_buffer[inptr++] = int_num;
+      if (inptr == MAX_INTS)
+        inptr = 0;
+
+        /* Clear the interrupt */
+        clr_int(int_num);
+    }
+
+    /* Wake up anybody waiting for a DIO interrupt */
+    wake_up_interruptible(&wq_dio);
+  }
+
+  if (status & 0x10) {
+    /* Clear DAC2 Interrupt */
+    inb(base_port+0x0d);    /* Clear interrupt */
+
+    /* Wake up DAC2 holding processes */
+    wake_up_interruptible(&wq_dac_2);
+  }
+
+  /* Reset the access to the interrupt ID register */
+  adc2_port_image = adc2_port_image & 0xdf;
+  outb(adc2_port_image,base_port+0x0f);
+}
+
 
 void clr_int(int bit_number)
 {

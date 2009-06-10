@@ -1,5 +1,10 @@
 2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* mio_io_rtems.c: All Linux functionality should be implemented now
+	EXCEPT hooking the interrupt.
+
+2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* mio_io_rtems.c: Add checking for interrupt status.
 
 2009-06-08	Joel Sherrill <joel.sherrill@oarcorp.com>
