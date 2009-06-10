@@ -188,6 +188,9 @@ int dio_enab_bit_int(int bit_number, int polarity);
 int dio_disab_bit_int(int bit_number);
 int dio_clr_int(int bit_number);
 int dio_get_int(void);
+int dio_get_int_with_timestamp(
+  unsigned long long *timestamp
+);
 int wait_adc_int(int adc_num);
 int wait_dac_int(int dac_num);
 int wait_dio_int(void);

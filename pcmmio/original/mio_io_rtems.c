@@ -29,7 +29,9 @@ static unsigned short irq = 0;
 static unsigned short base_port = 0;
 
 /* Function prototypes for local functions */
-int get_buffered_int(void);
+int get_buffered_int(
+  unsigned long long *timestamp
+);
 void init_io(unsigned short io_address);
 void clr_int(int bit_number);
 int get_int(void);
@@ -60,7 +62,6 @@ int mio_read_irq_assigned(void)
 
   if (check_handle())   /* Check for chip available */
     return -1;
-
 
   /* All of our programming of the hardware is handled at this level so that 
      all of the routines that need to shove and IRQ value into hardware will 
@@ -322,13 +323,19 @@ int adc_num;
 }
 
 
-int dio_get_int(void)
+int dio_get_int_with_timestamp(
+  unsigned long long *timestamp
+)
 {
   if (check_handle())   /* Check for chip available */
     return -1;
 
-  return get_buffered_int() & 0xff;
+  return get_buffered_int(timestamp) & 0xff;
+}
 
+int dio_get_int(void)
+{
+  return dio_get_int_with_timestamp(NULL);
 }
 
 int wait_adc_int(int adc_num)
@@ -368,12 +375,12 @@ int wait_dio_int(void)
   if (check_handle())   /* Check for chip available */
     return -1;
 
-  if((i = get_buffered_int()))
+  if((i = get_buffered_int(NULL)))
     return i;
 
   interruptible_sleep_on(&wq_dio);
 
-  i = get_buffered_int();
+  i = get_buffered_int(NULL);
 
   return i;
 }
@@ -497,6 +504,7 @@ void pcmmio_initialize(
   }
 }
 
+#include <libcpu/cpuModel.h> /* for rdtsc */
 
 /*
  *  From this point down, we should be able to share easily with the Linux
@@ -510,7 +518,12 @@ void pcmmio_initialize(
 
 #define MAX_INTS 1024
 
-static unsigned char int_buffer[MAX_INTS];
+typedef struct {
+  unsigned char      line;
+  unsigned long long timestamp;
+} DIO_Int_t;
+
+static DIO_Int_t int_buffer[MAX_INTS];
 static int inptr = 0;
 static int outptr = 0;
 
@@ -567,7 +580,9 @@ void common_handler(void)
 
       /* Buffer the interrupt */
 
-      int_buffer[inptr++] = int_num;
+      int_buffer[inptr].timestamp = rdtsc();
+      int_buffer[inptr].line = int_num;
+      inptr++;
       if (inptr == MAX_INTS)
         inptr = 0;
 
@@ -699,23 +714,27 @@ int get_int(void)
   return 0;
 }
 
-
-int get_buffered_int(void)
+int get_buffered_int(
+  unsigned long long *timestamp
+)
 {
-  int temp;
+  int                line;
 
   if (irq == 0) {
-    temp = get_int();
-    if (temp)
-      clr_int(temp);
-    return temp;
+    line = get_int();
+    if (line)
+      clr_int(line);
+    return line;
   }
 
   if (outptr != inptr) {
-    temp = int_buffer[outptr++];
+    if ( timestamp )
+      *timestamp = int_buffer[outptr].timestamp;
+    line = int_buffer[outptr].line;
+    outptr++;
     if (outptr == MAX_INTS)
       outptr = 0;
-    return temp;
+    return line;
   }
 
   return 0;
