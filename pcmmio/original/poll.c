@@ -1,20 +1,13 @@
-/* Poll.c Demonstration program for WinSystems PCM-MIO Driver */
+/* poll.c
+ * Demonstration program for WinSystems PCM-MIO Driver
+ *
+ * $Id$
+ */
 
-/*
-*
-* $Header$
-*
-* $Id$
-*
-* $Log$
-*
-*/
-
-/* This program demonstrates one manner in which an unprivledged 
-   application running in user space can sychronize to hardware events 
-   handled by a device driver running in Kernel space.
-*/
-
+/* This program demonstrates one manner in which an unprivileged 
+ * application running in user space can synchronize to hardware events 
+ * handled by a device driver running in Kernel space.
+ */
 
 #include "mio_io.h"    
 
@@ -26,7 +19,7 @@
 #include <pthread.h>
 
 
-/* This function will be a sub-processe using the Posix threads 
+/* This function will be a sub-processes using the Posix threads 
    capability of Linux. This thread will simulate a type of 
    Interrupt service routine in that it will start up and then suspend 
    until an interrupt occurs and the driver awakens it.

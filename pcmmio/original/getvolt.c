@@ -1,23 +1,17 @@
 /* getvolt.c WinSystems PCM-MIO driver Demonstration Program
-*
-*  $Header$
-*
-*  $Id$
-*
-*  $Log$
-*
-*
-*  Compile with :
-*
-*
-*	gcc getvolt.c mio_io.o -o getvolt
-*
-*
-*	This program demonstrates the adc_auto_get_channel_voltage
-*	function. It reads the voltage on the channel specified
-*	prints the value and then exits.
-* 
-*/
+ *
+ *  $Id$
+ *
+ * Compile for GNU/Linux with:
+ *
+ *
+ *   gcc getvolt.c mio_io.o -o getvolt
+ *
+ *
+ * This program demonstrates the adc_auto_get_channel_voltage
+ * function. It reads the voltage on the channel specified
+ * prints the value and then exits.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>

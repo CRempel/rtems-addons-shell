@@ -1,4 +1,6 @@
 /*
+ *  RTEMS Configuration and Initialization for PCMMIO Demonstration Programs	
+ *
  *  $Id$
  */
 
@@ -13,7 +15,6 @@ void *POSIX_Init(
   void *ignored
 )
 {
-    
   pcmmio_initialize(0, 0);
   main(0,NULL);
   exit(0);

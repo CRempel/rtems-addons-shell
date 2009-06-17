@@ -1,3 +1,9 @@
+2009-06-17	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* buffered.c, dacbuff.c, dacout.c, flash.c, getall.c, getvolt.c,
+	kbhit.c, mio_io.c, mio_io_linux.c, mio_io_rtems.c, pcmmio.c, poll.c,
+	repeat.c, rtems_config.c: Clean up. Worked on RTEMS IRQ support code.
+
 2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* mio_io.h, mio_io_rtems.c: Add timestamps to buffered interrupts.

@@ -1,34 +1,19 @@
-/* $Header$
-*
-*
-*   Filename : $RCSfile$
-*
-*   $Id$
-*
-*   $Log$
-*   Revision 1.1.1.1  2009/06/08 14:52:43  joel
-*   Initial import.
-*
-*   Revision 1.1  2005/04/19 20:39:11  steve
-*   Initial revision
-*
-*
-*
-*/
+/*
+ * $Id$
+ */
 
 
 /* These functions are from the Wrox Press Book "Beginning Linux
-   Programming - Second Edition" by Richard Stones and Neil Matthew.
-   (C) 1996 & 1999 and are included here in compliance with the GNU
-   Public license.
-
-*/
+ * Programming - Second Edition" by Richard Stones and Neil Matthew.
+ * (C) 1996 & 1999 and are included here in compliance with the GNU
+ * Public license.
+ */
 
 #include <stdio.h>
 #include <termios.h>
 #if defined(__linux__)
-#include <term.h>
-#include <curses.h>
+  #include <term.h>
+  #include <curses.h>
 #endif
 #include <unistd.h>
 

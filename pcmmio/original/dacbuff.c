@@ -2,23 +2,18 @@
 
 /*
 *
-* $Header$
-*
 * $Id$
 *
-* $Log$
 *
-*	Compile with :
+* Compile for GNU/Linux with:
 *
-*		gcc dacbuff.c kbhit.c mio_io.o -o dacbuff
+*     gcc dacbuff.c kbhit.c mio_io.o -o dacbuff
 *
 *
-*	This program demonstrates the adc_buffered_channel_conversions function
-*	which allows for a programmed sequence of conversions to be accomplished
-*	with a single call.
-*
+* This program demonstrates the adc_buffered_channel_conversions function
+* which allows for a programmed sequence of conversions to be accomplished
+* with a single call.
 */
-
 
 #include "mio_io.h"    
 #include <stdio.h>

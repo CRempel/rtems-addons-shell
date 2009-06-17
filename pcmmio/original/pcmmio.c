@@ -1,15 +1,7 @@
-/* PCMMIO.C    WinSystems PCM-MIO Linux Driver */
-
-/* 
- * $Header$
- * $Id$
- *
- * Filename : $RCSfile$
- * 
- * $Log$
- *
- *
+/*
  * WinSystems PCM-MIO Linux Device Driver
+ * 
+ * $Id$
  */
 
  static char *RCSInfo = "$Id$";
@@ -1024,4 +1016,3 @@ int temp;
 	return 0;
 }
 
-	

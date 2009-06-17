@@ -1,22 +1,13 @@
 /* Flash.c WinSystems PCM-MIO driver Demonstration Program
 *
-*  $Header$
-*
 *  $Id$
 *
-*  $Log$
-*  Revision 1.1.1.1  2009/06/08 14:52:43  joel
-*  Initial import.
+*  Compile for GNU/Linux with:
 *
+*    gcc flash.c kbhit.c mio_io.o -o flash
 *
-*
-*  Compile with :
-*
-*
-*	gcc flash.c kbhit.c mio_io.o -o flash
-*
-*   This very simple program, toggles each of the 48  DIO lines in succession, holding it low
-*   for 250ms and then releasing it.
+*  This very simple program, toggles each of the 48  DIO lines in succession,
+*  holding it low for 250ms and then releasing it.
 * 
 */
 

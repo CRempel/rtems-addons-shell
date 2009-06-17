@@ -1,20 +1,14 @@
 /* dacout.c WinSystems PCM-MIO driver Demonstration Program
 *
-*  $Header$
-*
 *  $Id$
 *
-*  $Log$
+* Compile for GNU/Linux with:
+*
+*   gcc dacout.c mio_io.o -o dacout
 *
 *
-*  Compile with :
-*
-*
-*	gcc dacout.c mio_io.o -o dacout
-*
-*
-*	This extremely simple program uses the set_dac_voltage function to update
-*   the dac output to a specific voltage.
+* This extremely simple program uses the set_dac_voltage function to update
+*  the dac output to a specific voltage.
 */
 
 #include <stdio.h>

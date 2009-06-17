@@ -1,25 +1,23 @@
-/* getall.c Demonstration program for use with the WinSystems PCM-MIO Linux driver
-*
-*	$Header$
-*
-*	$Id$
-*
-*	$Log$
-*
-*	Compile with :
-*
-*			gcc -static getall.c mio_io.o -o getall
-*/
+/* 
+ * Demonstration program for use with the WinSystems PCM-MIO driver
+ *
+ *	$Id$
+ *
+ * Compile for GNU/Linux with:
+ *
+ *    gcc -static getall.c mio_io.o -o getall
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "mio_io.h"
 
-/* This program demonstrates usage of the adc_convert_all_channels function call.
-   This allows for all 16 channels to be quickly converted and the results passed
-   back in an 16 element array. Note that this function does not return voltage values,
-   it returns raw 16-bit data directly from the converter.
-*/
+/* This program demonstrates usage of the adc_convert_all_channels
+ * function call.  This allows for all 16 channels to be quickly converted
+ * and the results passed back in an 16 element array. Note that this
+ * function does not return voltage values, it returns raw 16-bit data
+ * directly from the converter.
+ */
 
 
 /* This array will receive the result values for all 16 channels */

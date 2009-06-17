@@ -1,23 +1,16 @@
-/* repeat.c Demonstration program for WinSystems PCM-MIO Driver */
-
-/*
-*
-* $Header$
-*
-* $Id$
-*
-* $Log$
-*
-*	Compile with :
-*
-*		gcc repeat.c kbhit.c mio_io.o -o repeat
-*
-*
-*	This program demonstrates the adc_convert_single_repeated function
-*	which allows for a sequence of conversions to be accomplished
-*	with a single call on the same channel.
-*
-*/
+/* repeat.c
+ * Demonstration program for WinSystems PCM-MIO Driver
+ *
+ * $Id$
+ *
+ * Compile for GNU/Linux with:
+ *
+ *    gcc repeat.c kbhit.c mio_io.o -o repeat
+ *
+ * This program demonstrates the adc_convert_single_repeated function
+ * which allows for a sequence of conversions to be accomplished
+ * with a single call on the same channel.
+ */
 
 #include "mio_io.h"    
 

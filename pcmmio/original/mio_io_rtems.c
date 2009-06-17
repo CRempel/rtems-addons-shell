@@ -1,5 +1,5 @@
-/* mio_io.c WinSystems support module file for the  PCM-MIO RTEMS driver */
-/*
+/* mio_io.c WinSystems support module file for the  PCM-MIO RTEMS driver
+ *
  *  $Id$
  *
  *  This file implements the hardware access routines as implemented for RTEMS.
@@ -459,19 +459,34 @@ void wake_up_interruptible(
 
 void common_handler(void);
 
-void pcmmio_interrupt_handler(
+void pcmmio_irq_handler(
   rtems_irq_hdl_param param
 )
 {
+  common_handler();
+}
+
+static void pcmmio_irq_disable(const rtems_irq_connect_data *irq)
+{
+  BSP_irq_disable_at_i8259s(irq->name - BSP_IRQ_VECTOR_BASE);
+}
+static void pcmmio_irq_enable(const rtems_irq_connect_data *irq)
+{
+  BSP_irq_enable_at_i8259s(irq->name - BSP_IRQ_VECTOR_BASE);
+}
+
+static int pcmmio_irq_is_on(const rtems_irq_connect_data *irq)
+{
+  return BSP_irq_enabled_at_i8259s( irq->name );
 }
 
 rtems_irq_connect_data pcmmio_irq = {
   0,                            // name
-  pcmmio_interrupt_handler,     // handler
+  pcmmio_irq_handler,           // handler
   NULL,                         // parameter
-  NULL,                         // enable IRQ
-  NULL,                         // disable IRQ
-  NULL,                         // is IRQ enabled
+  pcmmio_irq_enable,            // enable IRQ
+  pcmmio_irq_disable,           // disable IRQ
+  pcmmio_irq_is_on,             // is IRQ enabled
 };
 
 /*
@@ -494,6 +509,7 @@ void pcmmio_initialize(
 
   /* install IRQ handler */
   if ( irq ) {
+    int status = 0;
     pcmmio_irq.name = irq;
     #if defined(BSP_SHARED_HANDLER_SUPPORT)
       BSP_install_rtems_shared_irq_handler( &pcmmio_irq );
@@ -501,6 +517,10 @@ void pcmmio_initialize(
       printk( "PCMMIO Installing IRQ handler as non-shared\n" );
       BSP_install_rtems_irq_handler( &pcmmio_irq );
     #endif
+    if ( !status ) {
+      printk("Error installing PCMMIO interrupt handler!\n" );
+      rtems_fatal_error_occurred( status );
+    }
   }
 }
 
@@ -524,8 +544,8 @@ typedef struct {
 } DIO_Int_t;
 
 static DIO_Int_t int_buffer[MAX_INTS];
-static int inptr = 0;
-static int outptr = 0;
+static int       inptr = 0;
+static int       outptr = 0;
 
 /* real copy is in mio_io.c */
 extern unsigned char adc2_port_image;
@@ -578,7 +598,12 @@ void common_handler(void)
         printk("<1>Buffering DIO interrupt on bit %d\n",int_num);
       #endif
 
-      /* Buffer the interrupt */
+      /*
+       * Buffer the interrupt
+       *
+       * NOTE: No need to worry about disabling interrupts,
+       *       we are in interrupts.
+       */
 
       int_buffer[inptr].timestamp = rdtsc();
       int_buffer[inptr].line = int_num;
@@ -718,7 +743,8 @@ int get_buffered_int(
   unsigned long long *timestamp
 )
 {
-  int                line;
+  rtems_interrupt_level level;
+  int                   line;
 
   if (irq == 0) {
     line = get_int();
@@ -727,15 +753,18 @@ int get_buffered_int(
     return line;
   }
 
-  if (outptr != inptr) {
-    if ( timestamp )
-      *timestamp = int_buffer[outptr].timestamp;
-    line = int_buffer[outptr].line;
-    outptr++;
-    if (outptr == MAX_INTS)
-      outptr = 0;
-    return line;
-  }
+  line = 0;
 
-  return 0;
+  rtems_interrupt_disable( level );
+    if (outptr != inptr) {
+      if ( timestamp )
+        *timestamp = int_buffer[outptr].timestamp;
+      line = int_buffer[outptr].line;
+      outptr++;
+      if (outptr == MAX_INTS)
+        outptr = 0;
+    }
+  rtems_interrupt_enable( level );
+  
+  return line;
 }

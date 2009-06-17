@@ -2,23 +2,17 @@
 
 /*
 *
-* $Header$
-*
 * $Id$
 *
-* $Log$
+* Compile for GNU/Linux with:
 *
-*	Compile with :
-*
-*		gcc buffered.c kbhit.c mio_io.o -o buffered -lpthread
+*   gcc buffered.c kbhit.c mio_io.o -o buffered -lpthread
 *
 *
-*	This program demonstrates the adc_buffered_channel_conversions function
-*	which allows for a programmed sequence of conversions to be accomplished
-*	with a single call.
-*
+*  This program demonstrates the adc_buffered_channel_conversions function
+*  which allows for a programmed sequence of conversions to be accomplished
+*  with a single call.
 */
-
 
 /* Our IOCTL definitions and all function prototypes */
 
