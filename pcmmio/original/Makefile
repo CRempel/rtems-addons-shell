@@ -7,7 +7,8 @@ RTEMS_MAKEFILE_PATH=/home/joel/rtems-4.10-work/bsp-install/i386-rtems4.10/pc386/
 #  RTEMS_MAKEFILE_PATH is typically set in an environment variable
 #
 
-MAINS= buffered.c dacbuff.c dacout.c flash.c getall.c getvolt.c poll.c repeat.c
+MAINS= buffered.c dacbuff.c dacout.c flash.c getall.c getvolt.c \
+  poll.c repeat.c simple_rtems.c
 
 PGMS=$(MAINS:%.c=${ARCH}/%.exe)
 

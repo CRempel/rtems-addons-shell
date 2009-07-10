@@ -15,8 +15,11 @@ void *POSIX_Init(
   void *ignored
 )
 {
-  pcmmio_initialize(0, 0);
+  /* default jumpers --> 0x300 and 0 --> no IRQ */
+  pcmmio_initialize(0x300, 0);
+
   main(0,NULL);
+
   exit(0);
   return NULL;
 }
