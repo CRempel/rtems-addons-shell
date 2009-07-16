@@ -31,4 +31,4 @@ OBJS= $(COBJS) $(CXXOBJS) $(ASOBJS)
 all:    ${ARCH} $(SHARED_COBJS) $(PGMS)
 
 ${ARCH}/%.exe: %.c
-	$(CC) -o $@ $< $(SHARED_COBJS)
+	$(CC) $(LDFLAGS) -o $@ $< $(SHARED_COBJS)

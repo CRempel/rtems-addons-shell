@@ -15,6 +15,8 @@ void *POSIX_Init(
   void *ignored
 )
 {
+  printk( "Initializing PCMMIO\n" );
+  sleep(1);
   /* default jumpers --> 0x300 and 0 --> no IRQ */
   pcmmio_initialize(0x300, 0);
 
