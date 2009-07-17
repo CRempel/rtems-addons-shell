@@ -31,8 +31,8 @@ OBJS= $(COBJS) $(CXXOBJS) $(ASOBJS) $(SHARED_COBJS) $(SHARED_CONFIG)
 
 all:    ${ARCH} $(OBJS) $(PGMS)
 
-${ARCH}/pcmmio_shell.exe: pcmmio_shell.c
+${ARCH}/pcmmio_shell.exe: pcmmio_shell.c $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $< $(SHARED_COBJS)
 
-${ARCH}/%.exe: %.c
+${ARCH}/%.exe: %.c $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $< $(SHARED_COBJS) $(SHARED_CONFIG)

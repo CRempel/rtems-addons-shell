@@ -1,8 +1,7 @@
 /* mio_io.c
- * WinSystems support module file for the  PCM-MIO Linux driver
+ * WinSystems support module file for the PCM-MIO Linux and RTEMS drivers
  *
  *  $Id$
- *
  *
  *  This file implements all of the supported 'C' language functions.
  *  Where necessary calls are made into a porting layer to access the

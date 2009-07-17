@@ -1,5 +1,11 @@
 2009-07-17	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* Makefile: Add dependencies so .exe's are relinked.
+	* mio_io.c: Typo.
+	* pcmmio_commands.c: Basic shell of command works.
+
+2009-07-17	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* Makefile: Shell appplication configured with a dummy pcmmio command.
 	* pcmmio_commands.c, pcmmio_commands.h, pcmmio_shell.c: New files.
 
