@@ -16,7 +16,7 @@ PGMS=$(MAINS:%.c=${ARCH}/%.exe)
 MANAGERS=all
 
 # C source names
-SHARED_CSRCS = mio_io.c kbhit.c pcmmio_commands.c
+SHARED_CSRCS = mio_io.c kbhit.c main_pcmmio_din.c
 #SHARED_CSRCS += mio_io_linux.c
 SHARED_CSRCS += mio_io_rtems.c
 
