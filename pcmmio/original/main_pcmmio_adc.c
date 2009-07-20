@@ -1,5 +1,5 @@
 /*
- *  pcmmio_din command
+ *  pcmmio_adc command
  *
  *  COPYRIGHT (c) 1989-2009.
  *  On-Line Applications Research Corporation (OAR).
@@ -17,45 +17,42 @@
 #include <getopt.h>
 
 #if defined(TESTING)
-  #define dio_read_bit(_x) (_x & 1)
+  #define adc_get_channel_voltage(_x) (_x + 1.5)
 #endif
 
-void pcmmio_dio_read(
-  int *dio
+void pcmmio_adc_read(
+  float *adc
 )
 {
-  int   bit;
+  int   input;
   
-  for ( bit=0 ; bit<48 ; bit++ ) {
-    dio[bit] = dio_read_bit(bit);
+  for ( input=0 ; input<16 ; input++ ) {
+    adc[input] = adc_get_channel_voltage(input);
   }
 }
 
-void pcmmio_dio_printf(
-  int *dio
+void pcmmio_adc_printf(
+  float *adc
 )
 {
   struct timespec ts;
-  int             bit;
 
   (void) rtems_clock_get_uptime( &ts );
-  printf( "%ld:%ld ", ts.tv_sec, ts.tv_nsec );
-  for ( bit=0 ; bit<48 ; bit+=4 ) {
-     printf(
-	"%d%d%d%d%s",
-	dio[bit +  0], dio[bit +  1],
-	dio[bit +  2], dio[bit +  3],
-        ((bit == 44) ? "\n" : " " )
-    );
-  }
+  printf(
+    "%03ld:%06ld %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f\n" 
+    "%11s%7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f\n",
+    ts.tv_sec, ts.tv_nsec/1000,
+    adc[0], adc[1], adc[2], adc[3], adc[4], adc[5], adc[6], adc[7],
+    "", adc[8], adc[9], adc[10], adc[11], adc[12], adc[13], adc[14], adc[15]
+  );
 }
 
-char pcmmio_din_usage[] =
+char pcmmio_adc_usage[] =
   "Usage: %s [-i iterations] [-p period] [-v]\n"
   "Where: maximum iterations defaults to 1\n"
   "       the period is in milliseconds and defaults to 1000\n";
 
-int main_pcmmio_din(int argc, char **argv)
+int main_pcmmio_adc(int argc, char **argv)
 {
   int    milliseconds;
   int    maximum;
@@ -64,8 +61,8 @@ int main_pcmmio_din(int argc, char **argv)
   bool   changed;
   bool   verbose;
   struct getopt_data getopt_reent;
-  int    dio_last[48];
-  int    dio_current[48];
+  float  adc_last[16];
+  float  adc_current[16];
 
   /*
    * Parse arguments here
@@ -87,14 +84,14 @@ int main_pcmmio_din(int argc, char **argv)
         verbose = true;
         break;
       default:
-        printf( pcmmio_din_usage, argv[0] );
+        printf( pcmmio_adc_usage, argv[0] );
         return -1;
     }
   }
 
   if ( maximum != 1 )
     printf(
-      "Polling discrete inputs for %d iterations with %d msec period\n",
+      "Polling analog inputs for %d iterations with %d msec period\n",
       maximum,
       milliseconds
     );
@@ -106,16 +103,16 @@ int main_pcmmio_din(int argc, char **argv)
 
   iterations = 1;
   while (1) {
-    pcmmio_dio_read(dio_current);
+    pcmmio_adc_read(adc_current);
    
     if ( iterations == 1 )
       changed = true;
-    else if ( memcmp( dio_last, dio_current, sizeof(dio_current) ) )
+    else if ( memcmp( adc_last, adc_current, sizeof(adc_current) ) )
       changed = true;
     
     if ( verbose || changed ) {
-      pcmmio_dio_printf(dio_current);
-      memcpy( dio_last, dio_current, sizeof(dio_current) );
+      pcmmio_adc_printf(adc_current);
+      memcpy( adc_last, adc_current, sizeof(adc_current) );
       changed = false;
     }
 
@@ -127,17 +124,17 @@ int main_pcmmio_din(int argc, char **argv)
   return 0;
 }
 
-rtems_shell_cmd_t Shell_PCMMIO_DIN_Command = {
-  "pcmmio_din",                                    /* name */
-  "Read PCMMIO Discrete Inputs",                   /* usage */
+rtems_shell_cmd_t Shell_PCMMIO_ADC_Command = {
+  "pcmmio_adc",                                    /* name */
+  "Read PCMMIO Analog Inputs",                     /* usage */
   "pcmmio",                                        /* topic */
-  main_pcmmio_din,                                 /* command */
+  main_pcmmio_adc,                                 /* command */
   NULL,                                            /* alias */
   NULL                                             /* next */
 };
 
-rtems_shell_alias_t Shell_PCMMIO_DIN_Alias = {
-  "pcmmio_din",          /* command */
-  "din"                  /* alias */
+rtems_shell_alias_t Shell_PCMMIO_ADC_Alias = {
+  "pcmmio_adc",          /* command */
+  "adc"                  /* alias */
 };
 

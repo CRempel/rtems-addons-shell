@@ -93,7 +93,7 @@ int main_pcmmio_dout(int argc, char **argv)
 
 rtems_shell_cmd_t Shell_PCMMIO_DOUT_Command = {
   "pcmmio_dout",                                   /* name */
-  pcmmio_dout_usage,                               /* usage */
+  "Write PCMMIO Discrete Outputs",                 /* usage */
   "pcmmio",                                        /* topic */
   main_pcmmio_dout,                                /* command */
   NULL,                                            /* alias */

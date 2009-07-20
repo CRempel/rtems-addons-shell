@@ -1,5 +1,12 @@
 2009-07-20	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* Makefile, README, main_pcmmio_din.c, main_pcmmio_dout.c,
+	pcmmio_commands.h: Add initial command to monitor analog inputs.
+	Clean up help and usage.
+	* main_pcmmio_adc.c: New file.
+
+2009-07-20	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* README: Add description of commands.
 	* main_pcmmio_din.c, main_pcmmio_dout.c: Fix usage.
 

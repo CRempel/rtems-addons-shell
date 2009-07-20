@@ -28,15 +28,22 @@ adding PCMMIO related commands to your shell.
   CONFIGURE_PCMMIO_ALIASES
   CONFIGURE_PCMMIO_COMMANDS
 
-pcmmio_din - Discrete Input
-    Usage: din [-i iterations] [-p period] [-v]
+pcmmio_din - Read Discrete Inputs
+    pcmmio_din [-i iterations] [-p period] [-v]
     Where: maximum iterations defaults to 1
-	   the period is in milliseconds and defaults to 1000
+           the period is in milliseconds and defaults to 1000
 
-pcmmio_dout - Discrete Output
+pcmmio_dout - Write a Discrete Output
     pcmmio_dout [-v] bit value
     Where: bit must be 0-47
            value must be 0 or 1
 
-din - alias for pcmmio_din 
-dout - alias for pcmmio_dout 
+pcmmio_adc - Read Analog Inputs
+    pcmmio_adc [-i iterations] [-p period] [-v]
+    Where: maximum iterations defaults to 1
+           the period is in milliseconds and defaults to 1000
+
+Aliases
+  + adc  - alias for pcmmio_adc 
+  + din  - alias for pcmmio_din 
+  + dout - alias for pcmmio_dout 
