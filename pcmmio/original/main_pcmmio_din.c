@@ -1,4 +1,6 @@
 /*
+ *  pcmmio_din command
+ *
  *  COPYRIGHT (c) 1989-2009.
  *  On-Line Applications Research Corporation (OAR).
  *
@@ -14,7 +16,9 @@
 #define __need_getopt_newlib
 #include <getopt.h>
 
-#define dio_read_bit(_x) (_x & 1)
+#if defined(TESTING)
+  #define dio_read_bit(_x) (_x & 1)
+#endif
 
 void pcmmio_dio_read(
   int *dio
@@ -134,5 +138,10 @@ rtems_shell_cmd_t Shell_PCMMIO_DIN_Command = {
   main_pcmmio_din,                                 /* command */
   NULL,                                            /* alias */
   NULL                                             /* next */
+};
+
+rtems_shell_alias_t Shell_PCMMIO_DIN_Alias = {
+  "pcmmio_din",          /* command */
+  "din"                  /* alias */
 };
 

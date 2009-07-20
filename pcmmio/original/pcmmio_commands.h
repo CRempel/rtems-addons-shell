@@ -18,8 +18,17 @@
 extern int main_pcmmio_din(int argc, char **argv);
 
 extern rtems_shell_cmd_t Shell_PCMMIO_DIN_Command;
+extern rtems_shell_cmd_t Shell_PCMMIO_DOUT_Command;
 
 #define CONFIGURE_PCMMIO_COMMANDS \
-  &Shell_PCMMIO_DIN_Command
+  &Shell_PCMMIO_DIN_Command, \
+  &Shell_PCMMIO_DOUT_Command
 
+extern rtems_shell_alias_t Shell_PCMMIO_DIN_Alias;
+extern rtems_shell_alias_t Shell_PCMMIO_DOUT_Alias;
+
+#define CONFIGURE_PCMMIO_ALIASES \
+  &Shell_PCMMIO_DIN_Alias, \
+  &Shell_PCMMIO_DOUT_Alias
+  
 #endif
