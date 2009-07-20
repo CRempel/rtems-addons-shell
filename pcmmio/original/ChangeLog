@@ -1,5 +1,10 @@
 2009-07-20	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* README: Add description of commands.
+	* main_pcmmio_din.c, main_pcmmio_dout.c: Fix usage.
+
+2009-07-20	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* Makefile, main_pcmmio_din.c, pcmmio_commands.h, pcmmio_shell.c: Add
 	dout command.
 	* main_pcmmio_dout.c: New file.

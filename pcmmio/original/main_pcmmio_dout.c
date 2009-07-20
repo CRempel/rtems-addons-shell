@@ -23,11 +23,11 @@
 
 char pcmmio_dout_usage[] =
   "Usage: %s [-v] bit value\n"
-  " Where: bit must be 0-47\n"
-  "        value must be 0 or 1\n";
+  "Where: bit must be 0-47\n"
+  "       value must be 0 or 1\n";
 
 #define PRINT_USAGE() \
-   printf( "%s%s", pcmmio_dout_usage, argv[0] );
+   printf( pcmmio_dout_usage, argv[0] );
 
 int main_pcmmio_dout(int argc, char **argv)
 {

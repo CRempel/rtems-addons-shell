@@ -10,7 +10,6 @@ with direct access functions.
 
 The driver uses 4 Classic API Barriers.
 
-
 --joel sherrill
 
 Issues
@@ -19,6 +18,25 @@ Issues
   to track the state of certain variables and access to these is not protected.
   This design flaw is carried over into the RTEMS version.
 
-+ We want to timestamp samples and the current code does not do that.
++ We want to timestamp samples and the initial code did not do that.  I
+  added this.
 
-+ Need an RTEMS configuration.
+RTEMS Shell Commands
+====================
+The following RTEMS Shell configuration aids are defined to assist in
+adding PCMMIO related commands to your shell.
+  CONFIGURE_PCMMIO_ALIASES
+  CONFIGURE_PCMMIO_COMMANDS
+
+pcmmio_din - Discrete Input
+    Usage: din [-i iterations] [-p period] [-v]
+    Where: maximum iterations defaults to 1
+	   the period is in milliseconds and defaults to 1000
+
+pcmmio_dout - Discrete Output
+    pcmmio_dout [-v] bit value
+    Where: bit must be 0-47
+           value must be 0 or 1
+
+din - alias for pcmmio_din 
+dout - alias for pcmmio_dout 

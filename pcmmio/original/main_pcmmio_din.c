@@ -52,8 +52,8 @@ void pcmmio_dio_printf(
 
 char pcmmio_din_usage[] =
   "Usage: %s [-i iterations] [-p period] [-v]\n"
-  " Where: maximum iterations defaults to 1\n"
-  "        the period is in milliseconds and defaults to 1000\n";
+  "Where: maximum iterations defaults to 1\n"
+  "       the period is in milliseconds and defaults to 1000\n";
 
 int main_pcmmio_din(int argc, char **argv)
 {
@@ -87,11 +87,7 @@ int main_pcmmio_din(int argc, char **argv)
         verbose = true;
         break;
       default:
-        printf(
-          "%s%s",
-          pcmmio_din_usage,
-          argv[0]
-        );
+        printf( pcmmio_din_usage, argv[0] );
         return -1;
     }
   }
