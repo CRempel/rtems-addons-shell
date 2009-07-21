@@ -43,6 +43,12 @@ pcmmio_adc - Read Analog Inputs
     Where: maximum iterations defaults to 1
            the period is in milliseconds and defaults to 1000
 
+pcmmio_adc - Write Analog Output
+    pcmmio_dac [-v] dac voltage\n"
+    Where: dac must be 0-7
+           voltage must be -10V to +10V
+
+
 Aliases
   + adc  - alias for pcmmio_adc 
   + din  - alias for pcmmio_din 

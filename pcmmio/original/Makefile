@@ -20,7 +20,7 @@ DEFINES += -DTESTING
 #SHARED_CSRCS += mio_io_linux.c
 SHARED_CSRCS = mio_io.c kbhit.c 
 SHARED_CSRCS += main_pcmmio_din.c main_pcmmio_dout.c
-SHARED_CSRCS += main_pcmmio_adc.c
+SHARED_CSRCS += main_pcmmio_adc.c main_pcmmio_dac.c
 SHARED_CSRCS += mio_io_rtems.c
 
 SHARED_COBJS = $(SHARED_CSRCS:%.c=${ARCH}/%.o)

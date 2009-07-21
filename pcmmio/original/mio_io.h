@@ -159,7 +159,6 @@ int set_dac_span(int channel, unsigned char span_value);
 int wait_dac_ready(int channel);
 int set_dac_output(int channel, unsigned short dac_value);
 int set_dac_voltage(int channel, float voltage);
-int set_dac_voltage(int channel, float voltage);
 unsigned char read_dio_byte(int offset);
 unsigned char mio_read_reg(int offset);
 int mio_write_reg(int offset, unsigned char value);
