@@ -48,8 +48,8 @@ pcmmio_adc - Write Analog Output
     Where: dac must be 0-7
            voltage must be -10V to +10V
 
-
 Aliases
   + adc  - alias for pcmmio_adc 
+  + dac  - alias for pcmmio_dac 
   + din  - alias for pcmmio_din 
   + dout - alias for pcmmio_dout 

@@ -12,6 +12,7 @@
  */
 
 #include "pcmmio_commands.h"
+#include <rtems/string2.h>
 
 #define __need_getopt_newlib
 #include <getopt.h>
@@ -64,14 +65,25 @@ int main_pcmmio_dac(int argc, char **argv)
   /*
    *  Convert the string arguments into number values
    */
-  dac     = strtof( argv[getopt_reent.optind], NULL );
+  if ( !rtems_string_to_int( argv[getopt_reent.optind], &dac, NULL, 0 ) ) {
+    printf( "DAC (%s) is not a number\n", argv[getopt_reent.optind] );
+    PRINT_USAGE();
+    return -1;
+  }
+
+  if ( !rtems_string_to_float( argv[getopt_reent.optind+1], &voltage, NULL ) ) {
+    printf( "Voltage (%s) is not a number\n", argv[getopt_reent.optind + 1] );
+    PRINT_USAGE();
+    return -1;
+  }
+
   voltage = strtof( argv[getopt_reent.optind + 1], NULL );
 
   /*
    *  Validate the output dac and voltage.
    */
   if ( dac < 0 || dac > 7 ) {
-    printf( "DAC number must be 0-7\n" );
+    puts( "DAC number must be 0-7" );
     PRINT_USAGE();
     return -1;
   }

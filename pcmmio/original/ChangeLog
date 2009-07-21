@@ -1,5 +1,11 @@
 2009-07-21	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* Makefile, README, main_pcmmio_dac.c, main_pcmmio_dout.c: Added
+	string2XXX routines to RTEMS so we have ability to do heavy error
+	checking on numeric inputs.
+
+2009-07-21	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* Makefile, README, mio_io.h, pcmmio_commands.h: Add pcmmio_dac
 	command.
 	* main_pcmmio_dac.c: New file.

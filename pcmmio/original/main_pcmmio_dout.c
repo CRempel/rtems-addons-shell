@@ -12,6 +12,7 @@
  */
 
 #include "pcmmio_commands.h"
+#include <rtems/string2.h>
 
 #define __need_getopt_newlib
 #include <getopt.h>
@@ -63,8 +64,17 @@ int main_pcmmio_dout(int argc, char **argv)
   /*
    *  Convert the string arguments into number values
    */
-  bit   = rtems_shell_str2int( argv[getopt_reent.optind] );
-  value = rtems_shell_str2int( argv[getopt_reent.optind + 1] );
+  if ( !rtems_string_to_int( argv[getopt_reent.optind], &bit, NULL, 0 ) ) {
+    printf( "Bit (%s) is not a number\n", argv[getopt_reent.optind] );
+    PRINT_USAGE();
+    return -1;
+  }
+
+  if ( !rtems_string_to_int(argv[getopt_reent.optind + 1], &value, NULL, 0) ) {
+    printf( "Value (%s) is not a number\n", argv[getopt_reent.optind] );
+    PRINT_USAGE();
+    return -1;
+  }
 
   /*
    *  Validate the output bit and value.
