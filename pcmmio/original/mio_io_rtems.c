@@ -43,8 +43,9 @@ rtems_id wq_dac_1;
 rtems_id wq_dac_2;
 rtems_id wq_dio;
 
-void interruptible_sleep_on(
-  rtems_id *id
+int interruptible_sleep_on(
+  rtems_id *id,
+  int       milliseconds
 );
 void wake_up_interruptible(
   rtems_id *id
@@ -338,39 +339,52 @@ int dio_get_int(void)
   return dio_get_int_with_timestamp(NULL);
 }
 
-int wait_adc_int(int adc_num)
+int wait_adc_int_with_timeout(int adc_num, int milliseconds)
 {
+  int sc;
+
   if (check_handle())   /* Check for chip available */
     return -1;
 
   if (adc_num) {
-    interruptible_sleep_on(&wq_a2d_1);
+    sc = interruptible_sleep_on(&wq_a2d_1, milliseconds);
   } else {
-    interruptible_sleep_on(&wq_a2d_2);
+    sc = interruptible_sleep_on(&wq_a2d_2, milliseconds);
   }
 
-  return 0;
+  return sc;
 }
 
-
-int wait_dac_int(int dac_num)
+int wait_adc_int(int adc_num)
 {
+  return wait_adc_int_with_timeout(adc_num, 0);
+}
+
+int wait_dac_int_with_timeout(int dac_num, int milliseconds)
+{
+  int sc;
+
   if (check_handle())   /* Check for chip available */
     return -1;
 
   if (dac_num) {
-    interruptible_sleep_on(&wq_dac_1);
+    sc = interruptible_sleep_on(&wq_dac_1, milliseconds);
   } else {
-    interruptible_sleep_on(&wq_dac_2);
+    sc = interruptible_sleep_on(&wq_dac_2, milliseconds);
   }
 
-  return 0;
+  return sc;
 }
 
+int wait_dac_int(int dac_num)
+{
+  return wait_dac_int_with_timeout(dac_num, 0);
+}
 
-int wait_dio_int(void)
+int wait_dio_int_with_timeout(int milliseconds)
 {
   int i;
+  int sc;
 
   if (check_handle())   /* Check for chip available */
     return -1;
@@ -378,13 +392,19 @@ int wait_dio_int(void)
   if((i = get_buffered_int(NULL)))
     return i;
 
-  interruptible_sleep_on(&wq_dio);
+  sc = interruptible_sleep_on(&wq_dio, milliseconds);
+  if ( sc != 0 )
+    return sc;
 
   i = get_buffered_int(NULL);
 
   return i;
 }
 
+int wait_dio_int(void)
+{
+  return wait_dio_int_with_timeout(0);
+}
 
 static int handle = 0; /* XXX move to lower */
 
@@ -433,13 +453,17 @@ void pcmmio_barrier_create(
  exit(1);
 }
 
-void interruptible_sleep_on(
-  rtems_id *id
+int interruptible_sleep_on(
+  rtems_id *id,
+  int       milliseconds
 )
 {
   rtems_status_code rc;
 
-  rc = rtems_barrier_wait(*id, 0);
+  rc = rtems_barrier_wait(*id, RTEMS_MILLISECONDS_TO_TICKS(milliseconds));
+  if ( rc == RTEMS_SUCCESSFUL )
+    return 0;
+  return -1;
 }
 
 void wake_up_interruptible(
@@ -512,14 +536,14 @@ void pcmmio_initialize(
     int status = 0;
     pcmmio_irq.name = irq;
     #if defined(BSP_SHARED_HANDLER_SUPPORT)
-      BSP_install_rtems_shared_irq_handler( &pcmmio_irq );
+      printk( "PCMMIO Installing IRQ handler as shared\n" );
+      status = BSP_install_rtems_shared_irq_handler( &pcmmio_irq );
     #else
       printk( "PCMMIO Installing IRQ handler as non-shared\n" );
-      BSP_install_rtems_irq_handler( &pcmmio_irq );
+      status = BSP_install_rtems_irq_handler( &pcmmio_irq );
     #endif
     if ( !status ) {
       printk("Error installing PCMMIO interrupt handler!\n" );
-      rtems_fatal_error_occurred( status );
     }
   }
 }

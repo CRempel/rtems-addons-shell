@@ -1,5 +1,12 @@
 2009-07-22	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* Makefile, README, main_pcmmio_dac.c, mio_io.h, mio_io_rtems.c,
+	pcmmio_commands.h, pcmmio_shell.c, rtems_config.c: Add pcmmio_irq
+	command and do some cleanup as noticed on other files.
+	* main_pcmmio_irq.c: New file.
+
+2009-07-22	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* README: Fix typo.
 
 2009-07-22	Joel Sherrill <joel.sherrill@oarcorp.com>

@@ -96,6 +96,7 @@ int main_pcmmio_dac(int argc, char **argv)
     }
     printf( "Write %6.4f to to dac %d\n", low_voltage, dac );
     set_dac_voltage(dac, low_voltage);
+    return 0;
   }
 
   /*

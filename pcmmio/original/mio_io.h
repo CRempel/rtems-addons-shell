@@ -13,10 +13,6 @@
 
 #if defined(__linux__)
 #include <linux/ioctl.h> 
-#else
-#define MAJOR_NUM 1
-#define _IOWR(_x, _y, _t) (_t) ((_x << 16) | (_y << 16))
-#endif
 
 
 /* These are the IOCTL value the pcmmio driver recognizes */
@@ -60,10 +56,11 @@
 
 #define DEVICE_FILE_NAME "pcmmio"
 
+#endif
 
 #endif
 
-/* These are the error codes doe mio_error_code */
+/* These are the error codes for mio_error_code */
 
 #define MIO_SUCCESS 0
 #define MIO_OPEN_ERROR 1
@@ -199,5 +196,9 @@ int wait_dio_int(void);
     unsigned short _base_port,
     unsigned short _irq
   );
+
+  int wait_adc_int_with_timeout(int adc_num, int milliseconds);
+  int wait_dac_int_with_timeout(int dac_num, int milliseconds);
+  int wait_dio_int_with_timeout(int milliseconds);
 #endif
 

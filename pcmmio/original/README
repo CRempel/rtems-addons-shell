@@ -54,6 +54,16 @@ pcmmio_adc - Write Analog Output
     First form is a single write.
     Second form writes a pattern.
 
+pcmmio_irq - Wait for PCMMIO IRQs
+  pcmmio_irq [-i iterations] [-p period] [-v] [-d|-D DAC|-a ADC]
+
+  Where: maximum iterations defaults to 1
+         the period is in milliseconds and defaults to 1000
+         -d enables discrete input irq monitoring
+         -D DAC enables irq monitoring on the DAC channel "DAC"
+         -a ADC enables irq monitoring on the ADC channel "ADC"
+
+  You select one of the three IRQ sources to monitor.
 
 Aliases
   + adc  - alias for pcmmio_adc 

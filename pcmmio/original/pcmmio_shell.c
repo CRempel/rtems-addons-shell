@@ -15,6 +15,8 @@ rtems_task Init(
   rtems_task_argument ignored
 )
 {
+  pcmmio_initialize(0x300, 6);
+
   printf(
     "\n"
     "\n"
@@ -43,14 +45,17 @@ rtems_task Init(
 #define CONFIGURE_APPLICATION_NEEDS_LIBBLOCK
 #define CONFIGURE_USE_IMFS_AS_BASE_FILESYSTEM
 
+#define CONFIGURE_MICROSECONDS_PER_TICK     1000
+
 #define CONFIGURE_MAXIMUM_TASKS                  20
 #define CONFIGURE_MAXIMUM_SEMAPHORES             20
+#define CONFIGURE_MAXIMUM_BARRIERS                4
 #define CONFIGURE_LIBIO_MAXIMUM_FILE_DESCRIPTORS 20
-#define CONFIGURE_STACK_CHECKER_ENABLED
 
 #define CONFIGURE_RTEMS_INIT_TASKS_TABLE
 #define CONFIGURE_EXTRA_TASK_STACKS         (6 * RTEMS_MINIMUM_STACK_SIZE)
 
+#define CONFIGURE_STACK_CHECKER_ENABLED
 #define CONFIGURE_MALLOC_STATISTICS
 
 #define CONFIGURE_INIT
