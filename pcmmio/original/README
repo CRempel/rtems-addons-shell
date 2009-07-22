@@ -45,7 +45,7 @@ pcmmio_adc - Read Analog Inputs
 
 pcmmio_adc - Write Analog Output
     pcmmio_dac dac voltage
-    pcmmio_dac low high step time_per_step maximum_time
+    pcmmio_dac dac low high step time_per_step maximum_time
 
     Where: dac must be 0-7
            voltages and step must be -10V to +10V

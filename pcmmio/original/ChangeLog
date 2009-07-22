@@ -1,5 +1,9 @@
 2009-07-22	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* README: Fix typo.
+
+2009-07-22	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* README, main_pcmmio_dac.c, rtems_config.c: Add mode to pcmmio_dac
 	command where it can write a pattern.
 
