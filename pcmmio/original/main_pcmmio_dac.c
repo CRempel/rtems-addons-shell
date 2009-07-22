@@ -14,8 +14,6 @@
 #include "pcmmio_commands.h"
 #include <rtems/string2.h>
 
-#define __need_getopt_newlib
-#include <getopt.h>
 #include <stdlib.h>
 
 #if defined(TESTING)
@@ -24,7 +22,7 @@
 #endif
 
 char pcmmio_dac_usage[] =
-  "Usage: %s [-v] dac voltage\n"
+  "Usage: %s dac voltage\n"
   "Where: dac must be 0-7\n"
   "       voltage must be -10V to +10V\n";
 
@@ -33,30 +31,14 @@ char pcmmio_dac_usage[] =
 
 int main_pcmmio_dac(int argc, char **argv)
 {
-  char   ch;
-  bool   verbose;
-  struct getopt_data getopt_reent;
   int    dac;
   float  voltage;
+  bool   fail = false;
 
   /*
-   * Parse arguments here
+   *  Verify that we have the right number of arguments.
    */
-  verbose = false;
-
-  memset(&getopt_reent, 0, sizeof(getopt_data));
-  while ((ch = getopt_r(argc, argv, "v", &getopt_reent)) != -1) {
-    switch (ch) {
-      case 'v': /* verbose*/
-        verbose = true;
-        break;
-      default:
-        PRINT_USAGE();
-        return -1;
-    }
-  }
-
-  if ( (argc - getopt_reent.optind) != 2 ) {
+  if ( argc != 3 ) {
     printf( "Incorrect number of arguments\n" );
     PRINT_USAGE();
     return -1;
@@ -65,31 +47,30 @@ int main_pcmmio_dac(int argc, char **argv)
   /*
    *  Convert the string arguments into number values
    */
-  if ( !rtems_string_to_int( argv[getopt_reent.optind], &dac, NULL, 0 ) ) {
-    printf( "DAC (%s) is not a number\n", argv[getopt_reent.optind] );
-    PRINT_USAGE();
-    return -1;
+  if ( !rtems_string_to_int( argv[1], &dac, NULL, 0 ) ) {
+    printf( "DAC (%s) is not a number\n", argv[1] );
+    fail = true;
   }
 
-  if ( !rtems_string_to_float( argv[getopt_reent.optind+1], &voltage, NULL ) ) {
-    printf( "Voltage (%s) is not a number\n", argv[getopt_reent.optind + 1] );
-    PRINT_USAGE();
-    return -1;
+  if ( !rtems_string_to_float( argv[2], &voltage, NULL ) ) {
+    printf( "Voltage (%s) is not a number\n", argv[2] );
+    fail = true;
   }
-
-  voltage = strtof( argv[getopt_reent.optind + 1], NULL );
 
   /*
    *  Validate the output dac and voltage.
    */
   if ( dac < 0 || dac > 7 ) {
     puts( "DAC number must be 0-7" );
-    PRINT_USAGE();
-    return -1;
+    fail = true;
   }
 
   if ( voltage < -10.0 || voltage > 10.0 ) {
     printf( "Voltage must be between -10.0V and +10.0V\n" );
+    fail = true;
+  }
+
+  if ( fail ) {
     PRINT_USAGE();
     return -1;
   }
@@ -97,8 +78,7 @@ int main_pcmmio_dac(int argc, char **argv)
   /*
    *  Now write the voltage
    */
-  if ( verbose )
-    printf( "Write %6.4f to to dac %d\n", voltage, dac );
+  printf( "Write %6.4f to to dac %d\n", voltage, dac );
   set_dac_voltage(dac, voltage);
 
   return 0;

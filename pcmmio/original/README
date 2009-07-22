@@ -34,7 +34,7 @@ pcmmio_din - Read Discrete Inputs
            the period is in milliseconds and defaults to 1000
 
 pcmmio_dout - Write a Discrete Output
-    pcmmio_dout [-v] bit value
+    pcmmio_dout bit value
     Where: bit must be 0-47
            value must be 0 or 1
 
@@ -44,7 +44,7 @@ pcmmio_adc - Read Analog Inputs
            the period is in milliseconds and defaults to 1000
 
 pcmmio_adc - Write Analog Output
-    pcmmio_dac [-v] dac voltage\n"
+    pcmmio_dac dac voltage
     Where: dac must be 0-7
            voltage must be -10V to +10V
 

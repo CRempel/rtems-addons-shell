@@ -12,6 +12,7 @@
  */
 
 #include "pcmmio_commands.h"
+#include <rtems/stringto.h>
 
 #define __need_getopt_newlib
 #include <getopt.h>
@@ -52,17 +53,21 @@ char pcmmio_adc_usage[] =
   "Where: maximum iterations defaults to 1\n"
   "       the period is in milliseconds and defaults to 1000\n";
 
+#define PRINT_USAGE() \
+   printf( pcmmio_adc_usage, argv[0] )
+
 int main_pcmmio_adc(int argc, char **argv)
 {
-  int    milliseconds;
-  int    maximum;
-  int    iterations;
-  char   ch;
-  bool   changed;
-  bool   verbose;
-  struct getopt_data getopt_reent;
-  float  adc_last[16];
-  float  adc_current[16];
+  int                 milliseconds;
+  int                 maximum;
+  int                 iterations;
+  char                ch;
+  bool                changed;
+  bool                verbose;
+  struct getopt_data  getopt_reent;
+  float               adc_last[16];
+  float               adc_current[16];
+  const  char        *s;
 
   /*
    * Parse arguments here
@@ -75,16 +80,33 @@ int main_pcmmio_adc(int argc, char **argv)
   while ((ch = getopt_r(argc, argv, "i:p:v", &getopt_reent)) != -1) {
     switch (ch) {
       case 'i': /* maximum iterations */
-        maximum = rtems_shell_str2int( getopt_reent.optarg );
+        s = getopt_reent.optarg;
+        if ( !rtems_string_to_int( s, &maximum, NULL, 0 ) ) {
+          printf( "Maximum iterations (%s) is not a number\n", s );
+          PRINT_USAGE();
+          return -1;
+        }
+
         break;
       case 'p': /* sampling period */
-        milliseconds = rtems_shell_str2int( getopt_reent.optarg );
+        s = getopt_reent.optarg;
+        if ( !rtems_string_to_int( s, &milliseconds, NULL, 0 ) ) {
+          printf( "Sampling period (%s) is not a number\n", s );
+          PRINT_USAGE();
+          return -1;
+        }
+        if ( milliseconds == 0 ) {
+          printf( "Sampling period (%d) is 0\n", milliseconds );
+          PRINT_USAGE();
+          return -1;
+        }
+
         break;
       case 'v': /* verbose*/
         verbose = true;
         break;
       default:
-        printf( pcmmio_adc_usage, argv[0] );
+        PRINT_USAGE();
         return -1;
     }
   }

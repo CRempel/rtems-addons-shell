@@ -12,10 +12,7 @@
  */
 
 #include "pcmmio_commands.h"
-#include <rtems/string2.h>
-
-#define __need_getopt_newlib
-#include <getopt.h>
+#include <rtems/stringto.h>
 
 #if defined(TESTING)
   #define dio_write_bit(_bit, _value) \
@@ -23,39 +20,23 @@
 #endif
 
 char pcmmio_dout_usage[] =
-  "Usage: %s [-v] bit value\n"
+  "Usage: %s bit value\n"
   "Where: bit must be 0-47\n"
   "       value must be 0 or 1\n";
 
 #define PRINT_USAGE() \
-   printf( pcmmio_dout_usage, argv[0] );
+   printf( pcmmio_dout_usage, argv[0] )
 
 int main_pcmmio_dout(int argc, char **argv)
 {
-  char   ch;
-  bool   verbose;
-  struct getopt_data getopt_reent;
   int    bit;
   int    value;
+  bool   fail = false;
 
   /*
-   * Parse arguments here
+   *  Verify that we have the right number of arguments.
    */
-  verbose = false;
-
-  memset(&getopt_reent, 0, sizeof(getopt_data));
-  while ((ch = getopt_r(argc, argv, "v", &getopt_reent)) != -1) {
-    switch (ch) {
-      case 'v': /* verbose*/
-        verbose = true;
-        break;
-      default:
-        PRINT_USAGE();
-        return -1;
-    }
-  }
-
-  if ( (argc - getopt_reent.optind) != 2 ) {
+  if ( argc != 3 ) {
     printf( "Incorrect number of arguments\n" );
     PRINT_USAGE();
     return -1;
@@ -64,16 +45,14 @@ int main_pcmmio_dout(int argc, char **argv)
   /*
    *  Convert the string arguments into number values
    */
-  if ( !rtems_string_to_int( argv[getopt_reent.optind], &bit, NULL, 0 ) ) {
-    printf( "Bit (%s) is not a number\n", argv[getopt_reent.optind] );
-    PRINT_USAGE();
-    return -1;
+  if ( !rtems_string_to_int( argv[1], &bit, NULL, 0 ) ) {
+    printf( "Bit (%s) is not a number\n", argv[1] );
+    fail = true;
   }
 
-  if ( !rtems_string_to_int(argv[getopt_reent.optind + 1], &value, NULL, 0) ) {
-    printf( "Value (%s) is not a number\n", argv[getopt_reent.optind] );
-    PRINT_USAGE();
-    return -1;
+  if ( !rtems_string_to_int(argv[2], &value, NULL, 0) ) {
+    printf( "Value (%s) is not a number\n", argv[2] );
+    fail = true;
   }
 
   /*
@@ -81,12 +60,15 @@ int main_pcmmio_dout(int argc, char **argv)
    */
   if ( bit < 0 || bit > 47 ) {
     printf( "Bit number must be 0-47\n" );
-    PRINT_USAGE();
-    return -1;
+    fail = true;
   }
 
   if ( value != 0 && value != 1 ) {
     printf( "Value must be 0 or 1\n" );
+    fail = true;
+  }
+
+  if ( fail ) {
     PRINT_USAGE();
     return -1;
   }
@@ -94,8 +76,7 @@ int main_pcmmio_dout(int argc, char **argv)
   /*
    *  Now write the value
    */
-  if ( verbose )
-    printf( "Write %d to to bit %d\n", value, bit );
+  printf( "Write %d to to bit %d\n", value, bit );
   dio_write_bit(bit, value);
 
   return 0;
