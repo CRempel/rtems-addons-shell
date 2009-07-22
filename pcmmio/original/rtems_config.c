@@ -33,6 +33,8 @@ void *POSIX_Init(
 #define CONFIGURE_POSIX_INIT_THREAD_TABLE
 #define CONFIGURE_MAXIMUM_POSIX_THREADS      3
 #define CONFIGURE_MAXIMUM_BARRIERS           4
+#define CONFIGURE_MICROSECONDS_PER_TICK      1
+
 
 #define CONFIGURE_INIT
 #include <rtems/confdefs.h>

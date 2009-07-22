@@ -45,8 +45,15 @@ pcmmio_adc - Read Analog Inputs
 
 pcmmio_adc - Write Analog Output
     pcmmio_dac dac voltage
+    pcmmio_dac low high step time_per_step maximum_time
+
     Where: dac must be 0-7
-           voltage must be -10V to +10V
+           voltages and step must be -10V to +10V
+           times are in milliseconds
+
+    First form is a single write.
+    Second form writes a pattern.
+
 
 Aliases
   + adc  - alias for pcmmio_adc 

@@ -18,27 +18,46 @@
 
 #if defined(TESTING)
   #define set_dac_voltage(_dac, _voltage) \
-    printf( "Testing: Write %6.4f to to dac %d\n", _voltage, _dac );
+    /* printf( "Testing: Write %6.4f to to dac %d\n", _voltage, _dac ); */
 #endif
+
+#define VALIDATE_VOLTAGE(_v) \
+  if ( (_v) < -10.0 || (_v) > 10.0 ) { \
+    printf( "Voltage must be between -10.0V and +10.0V\n" ); \
+    fail = true; \
+  }
 
 char pcmmio_dac_usage[] =
   "Usage: %s dac voltage\n"
+  "       %s dac low high step time_per_step maximum_time\n"
+  "\n"
   "Where: dac must be 0-7\n"
-  "       voltage must be -10V to +10V\n";
+  "       voltages and step must be -10V to +10V\n"
+  "       times are in milliseconds\n"
+  "  First form is a single write.\n"
+  "  Second form writes a pattern.\n";
 
 #define PRINT_USAGE() \
-   printf( pcmmio_dac_usage, argv[0] );
+   printf( pcmmio_dac_usage, argv[0], argv[0] );
 
 int main_pcmmio_dac(int argc, char **argv)
 {
-  int    dac;
-  float  voltage;
-  bool   fail = false;
+  int       dac;
+  float     low_voltage;
+  float     high_voltage;
+  float     step_voltage;
+  float     current_voltage;
+  float     current_step;
+  int       step_time;
+  int       maximum_time;
+  uint32_t  step_ticks;
+  bool      fail = false;
+  int       elapsed;
 
   /*
    *  Verify that we have the right number of arguments.
    */
-  if ( argc != 3 ) {
+  if ( (argc != 3) && (argc != 7) ) {
     printf( "Incorrect number of arguments\n" );
     PRINT_USAGE();
     return -1;
@@ -52,7 +71,7 @@ int main_pcmmio_dac(int argc, char **argv)
     fail = true;
   }
 
-  if ( !rtems_string_to_float( argv[2], &voltage, NULL ) ) {
+  if ( !rtems_string_to_float( argv[2], &low_voltage, NULL ) ) {
     printf( "Voltage (%s) is not a number\n", argv[2] );
     fail = true;
   }
@@ -65,22 +84,123 @@ int main_pcmmio_dac(int argc, char **argv)
     fail = true;
   }
 
-  if ( voltage < -10.0 || voltage > 10.0 ) {
-    printf( "Voltage must be between -10.0V and +10.0V\n" );
+  VALIDATE_VOLTAGE( low_voltage );
+
+  /*
+   *  Now do a single write to the DAC
+   */
+  if ( argc == 3 ) {
+    if ( fail ) {
+      PRINT_USAGE();
+      return -1;
+    }
+    printf( "Write %6.4f to to dac %d\n", low_voltage, dac );
+    set_dac_voltage(dac, low_voltage);
+  }
+
+  /*
+   *  Finish parsing the arguments to do a pattern
+   */
+  fail = false;
+
+  if ( !rtems_string_to_float( argv[3], &high_voltage, NULL ) ) {
+    printf( "Voltage (%s) is not a number\n", argv[3] );
     fail = true;
   }
+
+  VALIDATE_VOLTAGE( high_voltage );
+
+  if ( !rtems_string_to_float( argv[4], &step_voltage, NULL ) ) {
+    printf( "Step voltage (%s) is not a number\n", argv[4] );
+    fail = true;
+  }
+
+  VALIDATE_VOLTAGE( step_voltage );
+
+  if ( step_voltage < 0.0 ) {
+    printf( "Step voltage must be greater than 0\n" );
+    fail = true;
+  }
+
+  if ( !rtems_string_to_int( argv[5], &step_time, NULL, 0 ) ) {
+    printf( "Step time (%s) is not a number\n", argv[5] );
+    fail = true;
+  }
+
+  if ( !rtems_string_to_int( argv[6], &maximum_time, NULL, 0 ) ) {
+    printf( "Maximum time (%s) is not a number\n", argv[6] );
+    fail = true;
+  }
+
+  if ( step_time >= maximum_time ) {
+    printf(
+      "Step time (%d) must be less than maximum time (%d)\n",
+      step_time,
+      maximum_time
+    );
+    fail = true;
+  }
+
+  if ( step_time < 0 ) {
+    printf( "Step time must be greater than 0\n" );
+    fail = true;
+  }
+
+  if ( maximum_time < 0 ) {
+    printf( "Maximum time must be greater than 0\n" );
+    fail = true;
+  }
+
+  /*
+   *  Now write the pattern to the DAC
+   */
 
   if ( fail ) {
     PRINT_USAGE();
     return -1;
   }
 
-  /*
-   *  Now write the voltage
-   */
-  printf( "Write %6.4f to to dac %d\n", voltage, dac );
-  set_dac_voltage(dac, voltage);
+  printf(
+    "Write %6.4f-%6.4f step=%6.4f stepTime=%d msecs dac=%d max=%d msecs\n",
+    low_voltage,
+    high_voltage,
+    step_voltage,
+    step_time,
+    dac,
+    maximum_time
+  );
 
+  elapsed         = 0;
+  step_ticks      = RTEMS_MILLISECONDS_TO_TICKS(step_time);
+  current_voltage = low_voltage;
+  current_step    = step_voltage;
+
+  if ( low_voltage > high_voltage ) 
+    current_step    *= -1.0;
+
+  while (1) {
+  
+    #if defined(TESTING)
+      printf( "%d: Write %6.4f to to dac %d\n", elapsed, current_voltage, dac );
+    #endif
+    set_dac_voltage(dac, current_voltage);
+
+    current_voltage += current_step;
+    if ( current_voltage < low_voltage ) {
+      current_step    = step_voltage;
+      current_voltage = low_voltage;
+    } else if ( current_voltage > high_voltage ) {
+      current_step    = -1.0 * step_voltage;
+      current_voltage = high_voltage;
+    }
+
+    elapsed += step_time;
+    if ( elapsed > maximum_time )
+      break;
+
+    rtems_task_wake_after( step_ticks );
+  }
+   
   return 0;
 }
 
