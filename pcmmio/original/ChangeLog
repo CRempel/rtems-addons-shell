@@ -1,5 +1,9 @@
 2009-07-23	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* main_pcmmio_irq.c: Add code to report interrupts.
+
+2009-07-23	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* main_pcmmio_adc.c, main_pcmmio_dac.c, main_pcmmio_din.c,
 	main_pcmmio_dout.c, main_pcmmio_irq.c: Update checks of return status
 	from rtems_string_to_XXX to reflect change to rtems_status_code.

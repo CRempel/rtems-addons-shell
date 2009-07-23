@@ -33,7 +33,6 @@ int main_pcmmio_irq(int argc, char **argv)
   int                 iterations;
   int                 sc;
   char                ch;
-  bool                changed;
   bool                verbose;
   struct getopt_data  getopt_reent;
   const  char        *s;
@@ -44,6 +43,8 @@ int main_pcmmio_irq(int argc, char **argv)
   int                 adc = -1;
   int                 selected;
   const char         *irq = "";
+  int                 elapsed;
+  int                 interrupts;
 
   /*
    * Parse arguments here
@@ -156,10 +157,12 @@ int main_pcmmio_irq(int argc, char **argv)
   /*
    *  Now sample in the loop
    */
-  changed = false;
-
+  elapsed    = 0;
   iterations = 1;
+  interrupts = 0;
+
   while (1) {
+    sc = 0;
    
     if ( do_din == true ) {
       sc = wait_dio_int_with_timeout(milliseconds);
@@ -169,14 +172,24 @@ int main_pcmmio_irq(int argc, char **argv)
       sc = wait_dac_int_with_timeout(adc, milliseconds);
     }
 
-    #ifdef TESTING
-      fprintf( stderr, "%d ", sc );
-    #endif
+    if ( sc != -1 ) {
+      interrupts++;
+      if ( do_din == true )
+        printf( "%d %s irq pin %d\n", elapsed, irq, sc );
+      else
+        printf( "%d %s irq\n", elapsed, irq );
+    }
+
+    elapsed += milliseconds;
     if (iterations++ >= maximum )
       break;
-
   }
-  fprintf( stderr, "\n" );
+  printf(
+    "%d total interrupts from %s in %d milliseconds\n",
+    interrupts,
+    irq,
+    elapsed
+  );
   return 0;
 }
 
