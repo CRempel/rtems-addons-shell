@@ -81,7 +81,7 @@ int main_pcmmio_adc(int argc, char **argv)
     switch (ch) {
       case 'i': /* maximum iterations */
         s = getopt_reent.optarg;
-        if ( !rtems_string_to_int( s, &maximum, NULL, 0 ) ) {
+        if ( rtems_string_to_int( s, &maximum, NULL, 0 ) ) {
           printf( "Maximum iterations (%s) is not a number\n", s );
           PRINT_USAGE();
           return -1;
@@ -90,7 +90,7 @@ int main_pcmmio_adc(int argc, char **argv)
         break;
       case 'p': /* sampling period */
         s = getopt_reent.optarg;
-        if ( !rtems_string_to_int( s, &milliseconds, NULL, 0 ) ) {
+        if ( rtems_string_to_int( s, &milliseconds, NULL, 0 ) ) {
           printf( "Sampling period (%s) is not a number\n", s );
           PRINT_USAGE();
           return -1;

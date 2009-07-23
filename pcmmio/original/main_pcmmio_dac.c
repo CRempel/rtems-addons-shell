@@ -66,12 +66,12 @@ int main_pcmmio_dac(int argc, char **argv)
   /*
    *  Convert the string arguments into number values
    */
-  if ( !rtems_string_to_int( argv[1], &dac, NULL, 0 ) ) {
+  if ( rtems_string_to_int( argv[1], &dac, NULL, 0 ) ) {
     printf( "DAC (%s) is not a number\n", argv[1] );
     fail = true;
   }
 
-  if ( !rtems_string_to_float( argv[2], &low_voltage, NULL ) ) {
+  if ( rtems_string_to_float( argv[2], &low_voltage, NULL ) ) {
     printf( "Voltage (%s) is not a number\n", argv[2] );
     fail = true;
   }
@@ -104,14 +104,14 @@ int main_pcmmio_dac(int argc, char **argv)
    */
   fail = false;
 
-  if ( !rtems_string_to_float( argv[3], &high_voltage, NULL ) ) {
+  if ( rtems_string_to_float( argv[3], &high_voltage, NULL ) ) {
     printf( "Voltage (%s) is not a number\n", argv[3] );
     fail = true;
   }
 
   VALIDATE_VOLTAGE( high_voltage );
 
-  if ( !rtems_string_to_float( argv[4], &step_voltage, NULL ) ) {
+  if ( rtems_string_to_float( argv[4], &step_voltage, NULL ) ) {
     printf( "Step voltage (%s) is not a number\n", argv[4] );
     fail = true;
   }
@@ -123,12 +123,12 @@ int main_pcmmio_dac(int argc, char **argv)
     fail = true;
   }
 
-  if ( !rtems_string_to_int( argv[5], &step_time, NULL, 0 ) ) {
+  if ( rtems_string_to_int( argv[5], &step_time, NULL, 0 ) ) {
     printf( "Step time (%s) is not a number\n", argv[5] );
     fail = true;
   }
 
-  if ( !rtems_string_to_int( argv[6], &maximum_time, NULL, 0 ) ) {
+  if ( rtems_string_to_int( argv[6], &maximum_time, NULL, 0 ) ) {
     printf( "Maximum time (%s) is not a number\n", argv[6] );
     fail = true;
   }

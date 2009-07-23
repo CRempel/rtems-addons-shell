@@ -45,12 +45,12 @@ int main_pcmmio_dout(int argc, char **argv)
   /*
    *  Convert the string arguments into number values
    */
-  if ( !rtems_string_to_int( argv[1], &bit, NULL, 0 ) ) {
+  if ( rtems_string_to_int( argv[1], &bit, NULL, 0 ) ) {
     printf( "Bit (%s) is not a number\n", argv[1] );
     fail = true;
   }
 
-  if ( !rtems_string_to_int(argv[2], &value, NULL, 0) ) {
+  if ( rtems_string_to_int(argv[2], &value, NULL, 0) ) {
     printf( "Value (%s) is not a number\n", argv[2] );
     fail = true;
   }
