@@ -18,6 +18,7 @@
 
 #include <rtems.h>
 #include <i386_io.h>
+#include <bsp/irq.h>
 
 /*
  *  These are configured by the initialization call.
@@ -492,11 +493,11 @@ void pcmmio_irq_handler(
 
 static void pcmmio_irq_disable(const rtems_irq_connect_data *irq)
 {
-  BSP_irq_disable_at_i8259s(irq->name - BSP_IRQ_VECTOR_BASE);
+  BSP_irq_disable_at_i8259s(irq->name);
 }
 static void pcmmio_irq_enable(const rtems_irq_connect_data *irq)
 {
-  BSP_irq_enable_at_i8259s(irq->name - BSP_IRQ_VECTOR_BASE);
+  BSP_irq_enable_at_i8259s(irq->name);
 }
 
 static int pcmmio_irq_is_on(const rtems_irq_connect_data *irq)
@@ -512,6 +513,31 @@ rtems_irq_connect_data pcmmio_irq = {
   pcmmio_irq_disable,           // disable IRQ
   pcmmio_irq_is_on,             // is IRQ enabled
 };
+
+/* from pcmmio.c - GNU/Linux driver */
+void init_io(unsigned short io_address)
+{
+  int x;
+  unsigned short port;
+
+  /* save the address for later use */
+  port = io_address + 0X10;
+
+  /* Clear all of the I/O ports. This also makes them inputs */
+  for(x=0; x < 7; x++)
+    outb(0,port+x);
+
+  /* Set page 2 access, for interrupt enables */
+  outb(0x80,port+7);
+
+  /* Clear all interrupt enables */
+  outb(0,port+8);
+  outb(0,port+9);
+  outb(0,port+0x0a);
+
+  /* Restore page 0 register access */
+  outb(0,port+7);
+}
 
 /*
  * RTEMS specific initialization routine
@@ -531,8 +557,11 @@ void pcmmio_initialize(
   pcmmio_barrier_create( rtems_build_name( 'd', 'a', 'c', '2' ), &wq_dac_2 );
   pcmmio_barrier_create( rtems_build_name( 'd', 'i', 'o', ' ' ), &wq_dio );
 
+  if ( base_port )
+    init_io( base_port );
+
   /* install IRQ handler */
-  if ( irq ) {
+  if ( base_port && irq ) {
     int status = 0;
     pcmmio_irq.name = irq;
     #if defined(BSP_SHARED_HANDLER_SUPPORT)
@@ -543,7 +572,7 @@ void pcmmio_initialize(
       status = BSP_install_rtems_irq_handler( &pcmmio_irq );
     #endif
     if ( !status ) {
-      printk("Error installing PCMMIO interrupt handler!\n" );
+      printk("Error installing PCMMIO interrupt handler! status=%d\n", status );
     }
   }
 }
@@ -635,8 +664,8 @@ void common_handler(void)
       if (inptr == MAX_INTS)
         inptr = 0;
 
-        /* Clear the interrupt */
-        clr_int(int_num);
+      /* Clear the interrupt */
+      clr_int(int_num);
     }
 
     /* Wake up anybody waiting for a DIO interrupt */

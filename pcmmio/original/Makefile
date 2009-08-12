@@ -14,7 +14,7 @@ PGMS=$(MAINS:%.c=${ARCH}/%.exe)
 
 # optional managers required
 MANAGERS=all
-DEFINES += -DTESTING
+#DEFINES += -DTESTING
 
 # C source names
 #SHARED_CSRCS += mio_io_linux.c

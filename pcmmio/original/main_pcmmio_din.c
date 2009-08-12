@@ -12,6 +12,7 @@
  */
 
 #include "pcmmio_commands.h"
+#include "mio_io.h"
 #include <rtems/stringto.h>
 
 #define __need_getopt_newlib

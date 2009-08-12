@@ -43,7 +43,7 @@ pcmmio_adc - Read Analog Inputs
     Where: maximum iterations defaults to 1
            the period is in milliseconds and defaults to 1000
 
-pcmmio_adc - Write Analog Output
+pcmmio_dac - Write Analog Output
     pcmmio_dac dac voltage
     pcmmio_dac dac low high step time_per_step maximum_time
 

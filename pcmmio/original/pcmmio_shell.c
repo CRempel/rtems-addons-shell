@@ -15,8 +15,21 @@ rtems_task Init(
   rtems_task_argument ignored
 )
 {
+  /*
+   *  Initialize the PCMMIO module to use IRQ6.  Ours is jumpered for 0x300
+   *  base address.  We use discrete input interrupts so enable all of the
+   *  as edge triggered on 1.
+   */
   pcmmio_initialize(0x300, 6);
+  enable_dio_interrupt();
+  { int i;
+    for (i=1 ; i<=48 ; i++ )
+      dio_enab_bit_int(i, 1);
+  }
 
+  /*
+   *  Display a herald with some hints on usage
+   */
   printf(
     "\n"
     "\n"

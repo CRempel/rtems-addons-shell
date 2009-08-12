@@ -12,7 +12,8 @@
  */
 
 #include "pcmmio_commands.h"
-#include <rtems/string2.h>
+#include "mio_io.h"
+#include <rtems/stringto.h>
 
 #include <stdlib.h>
 
