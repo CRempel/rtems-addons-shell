@@ -197,8 +197,13 @@ int wait_dio_int(void);
     unsigned short _irq
   );
 
+  void flush_buffered_ints(void);
   int wait_adc_int_with_timeout(int adc_num, int milliseconds);
   int wait_dac_int_with_timeout(int dac_num, int milliseconds);
   int wait_dio_int_with_timeout(int milliseconds);
+  int wait_dio_int_with_timestamp(
+    int                 milliseconds,
+    unsigned long long *timestamp
+  );
 #endif
 

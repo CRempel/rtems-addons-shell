@@ -1,3 +1,9 @@
+2009-08-13	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* main_pcmmio_irq.c, mio_io.h, mio_io_rtems.c: Add ADCs confirmed to
+	work using the dac command. Both single voltages and a pattern were
+	written.
+
 2009-08-12	Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* Makefile, README, main_pcmmio_adc.c, main_pcmmio_dac.c,

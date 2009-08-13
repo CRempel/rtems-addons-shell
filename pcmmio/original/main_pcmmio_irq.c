@@ -45,6 +45,7 @@ int main_pcmmio_irq(int argc, char **argv)
   const char         *irq = "";
   int                 elapsed;
   int                 interrupts;
+  unsigned long long  timestamp;
 
   /*
    * Parse arguments here
@@ -161,11 +162,12 @@ int main_pcmmio_irq(int argc, char **argv)
   iterations = 1;
   interrupts = 0;
 
+  flush_buffered_ints();
   while (1) {
     sc = 0;
    
     if ( do_din == true ) {
-      sc = wait_dio_int_with_timeout(milliseconds);
+      sc = wait_dio_int_with_timestamp(milliseconds, &timestamp);
     } else if ( do_dac == true ) {
       sc = wait_dac_int_with_timeout(dac, milliseconds);
     } else if ( do_adc == true ) {
@@ -175,7 +177,7 @@ int main_pcmmio_irq(int argc, char **argv)
     if ( sc != -1 ) {
       interrupts++;
       if ( do_din == true )
-        printf( "%d %s irq pin %d\n", elapsed, irq, sc );
+        printf( "%d %s irq pin %d @ %llx\n", elapsed, irq, sc, timestamp );
       else
         printf( "%d %s irq\n", elapsed, irq );
     }

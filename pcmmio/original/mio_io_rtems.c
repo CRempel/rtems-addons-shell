@@ -382,7 +382,10 @@ int wait_dac_int(int dac_num)
   return wait_dac_int_with_timeout(dac_num, 0);
 }
 
-int wait_dio_int_with_timeout(int milliseconds)
+int wait_dio_int_with_timestamp(
+  int                 milliseconds,
+  unsigned long long *timestamp
+)
 {
   int i;
   int sc;
@@ -397,14 +400,19 @@ int wait_dio_int_with_timeout(int milliseconds)
   if ( sc != 0 )
     return sc;
 
-  i = get_buffered_int(NULL);
+  i = get_buffered_int(timestamp);
 
   return i;
 }
 
+int wait_dio_int_with_timeout(int milliseconds)
+{
+  return wait_dio_int_with_timestamp(milliseconds, NULL);
+}
+
 int wait_dio_int(void)
 {
-  return wait_dio_int_with_timeout(0);
+  return wait_dio_int_with_timestamp(0, NULL);
 }
 
 static int handle = 0; /* XXX move to lower */
@@ -547,6 +555,9 @@ void pcmmio_initialize(
   unsigned short _irq
 )
 {
+  /* reset discrete interrupt input counters */
+  flush_buffered_ints();
+
   /* hardware configuration information */
   base_port = _base_port;
   irq       = _irq;
@@ -790,6 +801,12 @@ int get_int(void)
   */
   outb(0,dio_port+7);
   return 0;
+}
+
+void flush_buffered_ints(void)
+{
+  inptr = 0;
+  outptr = 0;
 }
 
 int get_buffered_int(
