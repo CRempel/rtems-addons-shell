@@ -78,7 +78,7 @@ int main_pcmmio_dout(int argc, char **argv)
    *  Now write the value
    */
   printf( "Write %d to to bit %d\n", value, bit );
-  dio_write_bit(bit, value);
+  dio_write_bit(bit+1, value);
 
   return 0;
 }

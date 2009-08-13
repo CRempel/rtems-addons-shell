@@ -1,5 +1,10 @@
 2009-08-13	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* main_pcmmio_dout.c: Fix mismatch in numbering between our view of
+	0-47 and driver's 1-48 view.
+
+2009-08-13	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* main_pcmmio_irq.c, mio_io.h, mio_io_rtems.c: Add ADCs confirmed to
 	work using the dac command. Both single voltages and a pattern were
 	written.
