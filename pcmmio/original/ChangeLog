@@ -1,3 +1,7 @@
+2009-10-13	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* main_pcmmio_dac.c: Fix help message.
+
 2009-08-13	Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* main_pcmmio_dout.c: Fix mismatch in numbering between our view of

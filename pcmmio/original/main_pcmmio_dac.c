@@ -208,7 +208,7 @@ int main_pcmmio_dac(int argc, char **argv)
 
 rtems_shell_cmd_t Shell_PCMMIO_DAC_Command = {
   "pcmmio_dac",                                    /* name */
-  "Read PCMMIO Analog Inputs",                     /* usage */
+  "Write PCMMIO Analog Outputs",                   /* usage */
   "pcmmio",                                        /* topic */
   main_pcmmio_dac,                                 /* command */
   NULL,                                            /* alias */
