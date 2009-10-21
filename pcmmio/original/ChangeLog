@@ -1,3 +1,8 @@
+2009-10-21	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* main_pcmmio_din.c, main_pcmmio_irq.c: Adjust bit numbering
+	difference.
+
 2009-10-13	Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* main_pcmmio_dac.c: Fix help message.

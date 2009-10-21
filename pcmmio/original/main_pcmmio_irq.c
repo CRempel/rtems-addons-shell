@@ -177,7 +177,7 @@ int main_pcmmio_irq(int argc, char **argv)
     if ( sc != -1 ) {
       interrupts++;
       if ( do_din == true )
-        printf( "%d %s irq pin %d @ %llx\n", elapsed, irq, sc, timestamp );
+        printf( "%d %s irq pin %d @ %llx\n", elapsed, irq, sc - 1, timestamp );
       else
         printf( "%d %s irq\n", elapsed, irq );
     }

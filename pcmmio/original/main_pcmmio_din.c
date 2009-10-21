@@ -29,7 +29,7 @@ void pcmmio_dio_read(
   int   bit;
   
   for ( bit=0 ; bit<48 ; bit++ ) {
-    dio[bit] = dio_read_bit(bit);
+    dio[bit] = dio_read_bit(bit+1);
   }
 }
 
