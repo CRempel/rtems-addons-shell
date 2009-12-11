@@ -205,5 +205,6 @@ int wait_dio_int(void);
     int                 milliseconds,
     unsigned long long *timestamp
   );
+  int dio_get_missed_interrupts(void);
 #endif
 

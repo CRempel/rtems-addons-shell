@@ -1,3 +1,9 @@
+2009-12-11	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* README: Add list of new methods.
+	* mio_io.h, mio_io_rtems.c: Add dio_get_missed_interrupts() with
+	no tracking of missed interrupts since will switch to message queues.
+
 2009-10-21	Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* main_pcmmio_din.c, main_pcmmio_irq.c: Adjust bit numbering

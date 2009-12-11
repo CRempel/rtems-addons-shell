@@ -21,6 +21,27 @@ Issues
 + We want to timestamp samples and the initial code did not do that.  I
   added this.
 
+New Methods
+===========
+  void pcmmio_initialize(
+    unsigned short _base_port,
+    unsigned short _irq
+  );
+
+  void flush_buffered_ints(void);
+
+  int wait_adc_int_with_timeout(int adc_num, int milliseconds);
+
+  int wait_dac_int_with_timeout(int dac_num, int milliseconds);
+
+  int wait_dio_int_with_timeout(int milliseconds);
+
+  int wait_dio_int_with_timestamp(
+    int                 milliseconds,
+    unsigned long long *timestamp
+  );
+  int dio_get_missed_interrupts(void);
+
 RTEMS Shell Commands
 ====================
 The following RTEMS Shell configuration aids are defined to assist in

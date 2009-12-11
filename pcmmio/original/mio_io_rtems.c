@@ -44,6 +44,8 @@ rtems_id wq_dac_1;
 rtems_id wq_dac_2;
 rtems_id wq_dio;
 
+unsigned int pcmmio_dio_missed_interrupts;
+
 int interruptible_sleep_on(
   rtems_id *id,
   int       milliseconds
@@ -559,8 +561,9 @@ void pcmmio_initialize(
   flush_buffered_ints();
 
   /* hardware configuration information */
-  base_port = _base_port;
-  irq       = _irq;
+  base_port                    = _base_port;
+  irq                          = _irq;
+  pcmmio_dio_missed_interrupts = 0;
 
   /* Create RTEMS Objects */
   pcmmio_barrier_create( rtems_build_name( 'a', '2', 'd', '1' ), &wq_a2d_1 );
@@ -837,4 +840,15 @@ int get_buffered_int(
   rtems_interrupt_enable( level );
   
   return line;
+}
+
+int dio_get_missed_interrupts(void)
+{
+  int isrs;
+
+  isrs = pcmmio_dio_missed_interrupts;
+
+  pcmmio_dio_missed_interrupts = 0;
+
+  return isrs;
 }
