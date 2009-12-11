@@ -62,8 +62,15 @@ rtems_task Init(
 
 #define CONFIGURE_MAXIMUM_TASKS                  20
 #define CONFIGURE_MAXIMUM_SEMAPHORES             20
-#define CONFIGURE_MAXIMUM_BARRIERS                4
+#define CONFIGURE_MAXIMUM_BARRIERS                3
+#define CONFIGURE_MAXIMUM_MESSAGE_QUEUES          1
 #define CONFIGURE_LIBIO_MAXIMUM_FILE_DESCRIPTORS 20
+
+/*
+ * discrete in messages are 12 bytes and there are 1024 of them 
+ */
+#define CONFIGURE_MESSAGE_BUFFER_MEMORY \
+        CONFIGURE_MESSAGE_BUFFERS_FOR_QUEUE(1024, 12)
 
 #define CONFIGURE_RTEMS_INIT_TASKS_TABLE
 #define CONFIGURE_EXTRA_TASK_STACKS         (6 * RTEMS_MINIMUM_STACK_SIZE)

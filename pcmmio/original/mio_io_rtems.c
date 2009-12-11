@@ -44,6 +44,18 @@ rtems_id wq_dac_1;
 rtems_id wq_dac_2;
 rtems_id wq_dio;
 
+/*
+ *  Limits on number of buffered discrete input interrupts in
+ *  the message queue.
+ */
+#define MAXIMUM_BUFFERED_DISCRETE_INTERRUPTS 1024
+
+///////////////////////////////////////////////////////////////////////////////
+typedef struct {
+  unsigned long long timestamp;
+  int                pin;
+} din_message_t;
+
 unsigned int pcmmio_dio_missed_interrupts;
 
 int interruptible_sleep_on(
@@ -54,7 +66,6 @@ void wake_up_interruptible(
   rtems_id *id
 );
 
-///////////////////////////////////////////////////////////////////////////////
 //
 //    MIO_READ_IRQ_ASSIGNED
 //
@@ -389,22 +400,34 @@ int wait_dio_int_with_timestamp(
   unsigned long long *timestamp
 )
 {
-  int i;
-  int sc;
+  rtems_status_code  rc;
+  din_message_t      din;
+  size_t             received;
 
   if (check_handle())   /* Check for chip available */
     return -1;
 
-  if((i = get_buffered_int(NULL)))
-    return i;
+  rc = rtems_message_queue_receive(
+    wq_dio,
+    &din,
+    &received,
+    RTEMS_DEFAULT_OPTIONS,
+    RTEMS_MILLISECONDS_TO_TICKS(milliseconds)
+  );
+  if ( rc == RTEMS_UNSATISFIED )
+    return -1;
 
-  sc = interruptible_sleep_on(&wq_dio, milliseconds);
-  if ( sc != 0 )
-    return sc;
+  if ( rc == RTEMS_TIMEOUT )
+    return -1;
 
-  i = get_buffered_int(timestamp);
+  if ( rc != RTEMS_SUCCESSFUL ) {
+    printk( "wait_dio_int_with_timestamp - error %d\n", rc );
+    exit( 0 );
+  }
 
-  return i;
+  if (timestamp)
+    *timestamp = din.timestamp;
+  return din.pin;
 }
 
 int wait_dio_int_with_timeout(int milliseconds)
@@ -462,6 +485,30 @@ void pcmmio_barrier_create(
 
  printk( "Unable to create PCMMIO Barrier\n" );
  exit(1);
+}
+
+/*
+ *  RTEMS barrier create helper
+ */
+void pcmmio_din_queue_create(
+  rtems_name  name,
+  rtems_id   *id
+)
+{
+  rtems_status_code rc;
+
+  rc = rtems_message_queue_create(
+    name,
+    MAXIMUM_BUFFERED_DISCRETE_INTERRUPTS,
+    sizeof(din_message_t),
+    RTEMS_DEFAULT_ATTRIBUTES,
+    id
+  );
+  if ( rc == RTEMS_SUCCESSFUL )
+    return;
+
+  printk( "Unable to create PCMMIO DIN IRQ Message Queue\n" );
+  exit(1);
 }
 
 int interruptible_sleep_on(
@@ -557,9 +604,6 @@ void pcmmio_initialize(
   unsigned short _irq
 )
 {
-  /* reset discrete interrupt input counters */
-  flush_buffered_ints();
-
   /* hardware configuration information */
   base_port                    = _base_port;
   irq                          = _irq;
@@ -569,7 +613,7 @@ void pcmmio_initialize(
   pcmmio_barrier_create( rtems_build_name( 'a', '2', 'd', '1' ), &wq_a2d_1 );
   pcmmio_barrier_create( rtems_build_name( 'd', 'a', 'c', '1' ), &wq_dac_1 );
   pcmmio_barrier_create( rtems_build_name( 'd', 'a', 'c', '2' ), &wq_dac_2 );
-  pcmmio_barrier_create( rtems_build_name( 'd', 'i', 'o', ' ' ), &wq_dio );
+  pcmmio_din_queue_create( rtems_build_name( 'd', 'i', 'o', ' ' ), &wq_dio );
 
   if ( base_port )
     init_io( base_port );
@@ -598,21 +642,6 @@ void pcmmio_initialize(
  *  driver but I haven't gone to the trouble to do surgery on it.  I have
  *  no way to test it.
  */
-
-/* We will buffer up the transition interrupts and will pass them on
-   to waiting applications
-*/
-
-#define MAX_INTS 1024
-
-typedef struct {
-  unsigned char      line;
-  unsigned long long timestamp;
-} DIO_Int_t;
-
-static DIO_Int_t int_buffer[MAX_INTS];
-static int       inptr = 0;
-static int       outptr = 0;
 
 /* real copy is in mio_io.c */
 extern unsigned char adc2_port_image;
@@ -661,22 +690,22 @@ void common_handler(void)
     /* DIO interrupt. Find out which bit */
     int_num = get_int();
     if (int_num) {
-      #ifdef DEBUG
-        printk("<1>Buffering DIO interrupt on bit %d\n",int_num);
-      #endif
+      rtems_status_code  rc;
+      din_message_t      din;
 
-      /*
-       * Buffer the interrupt
-       *
-       * NOTE: No need to worry about disabling interrupts,
-       *       we are in interrupts.
-       */
+      din.timestamp = rdtsc(); 
+      din.pin       = int_num; 
 
-      int_buffer[inptr].timestamp = rdtsc();
-      int_buffer[inptr].line = int_num;
-      inptr++;
-      if (inptr == MAX_INTS)
-        inptr = 0;
+      rc = rtems_message_queue_send( wq_dio, &din, sizeof(din_message_t) );
+      if ( rc != RTEMS_SUCCESSFUL ) {
+        pcmmio_dio_missed_interrupts++;
+        #ifdef DEBUG
+          printk("<1>Missed DIO interrupt\n" );
+        #endif
+     }
+     #ifdef DEBUG
+       printk("<1>Buffering DIO interrupt on bit %d\n",int_num);
+     #endif
 
       /* Clear the interrupt */
       clr_int(int_num);
@@ -808,16 +837,24 @@ int get_int(void)
 
 void flush_buffered_ints(void)
 {
-  inptr = 0;
-  outptr = 0;
+  rtems_status_code  rc;
+  size_t             flushed;
+
+  rc = rtems_message_queue_flush( wq_dio, &flushed );
+  if ( rc != RTEMS_SUCCESSFUL ) {
+    printk( "flushed_buffered_int - error %d\n", rc );
+    exit( 0 );
+  }
 }
 
 int get_buffered_int(
   unsigned long long *timestamp
 )
 {
-  rtems_interrupt_level level;
-  int                   line;
+  rtems_status_code  rc;
+  din_message_t      din;
+  int                line;
+  size_t             received;
 
   if (irq == 0) {
     line = get_int();
@@ -826,20 +863,24 @@ int get_buffered_int(
     return line;
   }
 
-  line = 0;
+  rc = rtems_message_queue_receive(
+    wq_dio,
+    &din,
+    &received,
+    RTEMS_NO_WAIT,
+    0
+  );
+  if ( rc == RTEMS_UNSATISFIED )
+    return 0;
 
-  rtems_interrupt_disable( level );
-    if (outptr != inptr) {
-      if ( timestamp )
-        *timestamp = int_buffer[outptr].timestamp;
-      line = int_buffer[outptr].line;
-      outptr++;
-      if (outptr == MAX_INTS)
-        outptr = 0;
-    }
-  rtems_interrupt_enable( level );
-  
-  return line;
+  if ( rc != RTEMS_SUCCESSFUL ) {
+    printk( "get_buffered_int - error %d\n", rc );
+    exit( 0 );
+  }
+
+  if (timestamp)
+    *timestamp = din.timestamp;
+  return din.pin;
 }
 
 int dio_get_missed_interrupts(void)

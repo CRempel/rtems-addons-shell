@@ -42,6 +42,17 @@ New Methods
   );
   int dio_get_missed_interrupts(void);
 
+RTEMS Configuration
+===================
+The driver needs:
+
++ 3 Classic API Barriers
++ 1 Classic API Message Queue
+  - 1024 buffers of sizeof(din_messsage_t) (should be 12 bytes)
+
+The pcmmio_shell example is probably over configured but is a
+working guide.
+
 RTEMS Shell Commands
 ====================
 The following RTEMS Shell configuration aids are defined to assist in
