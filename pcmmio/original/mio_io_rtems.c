@@ -319,7 +319,7 @@ unsigned char adc_read_status(int adc_num)
 
 unsigned short adc_read_conversion_data(int channel)
 {
-int adc_num;
+  int adc_num;
 
   mio_error_code = MIO_SUCCESS;
 
@@ -342,6 +342,8 @@ int dio_get_int_with_timestamp(
   unsigned long long *timestamp
 )
 {
+  mio_error_code = MIO_SUCCESS;
+
   if (check_handle())   /* Check for chip available */
     return -1;
 
@@ -350,12 +352,16 @@ int dio_get_int_with_timestamp(
 
 int dio_get_int(void)
 {
+  mio_error_code = MIO_SUCCESS;
+
   return dio_get_int_with_timestamp(NULL);
 }
 
 int wait_adc_int_with_timeout(int adc_num, int milliseconds)
 {
   int sc;
+
+  mio_error_code = MIO_SUCCESS;
 
   if (check_handle())   /* Check for chip available */
     return -1;
@@ -377,6 +383,8 @@ int wait_adc_int(int adc_num)
 int wait_dac_int_with_timeout(int dac_num, int milliseconds)
 {
   int sc;
+
+  mio_error_code = MIO_SUCCESS;
 
   if (check_handle())   /* Check for chip available */
     return -1;
@@ -403,6 +411,8 @@ int wait_dio_int_with_timestamp(
   rtems_status_code  rc;
   din_message_t      din;
   size_t             received;
+
+  mio_error_code = MIO_SUCCESS;
 
   if (check_handle())   /* Check for chip available */
     return -1;

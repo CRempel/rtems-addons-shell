@@ -1,5 +1,10 @@
 2009-12-11	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* mio_io_rtems.c: Ensure mio_error_code is properly initialized to
+	MIO_SUCCESS.
+
+2009-12-11	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* main_pcmmio_din.c, main_pcmmio_irq.c, pcmmio_shell.c: Report time
 	between discrete in interrupts in microseconds.
 
