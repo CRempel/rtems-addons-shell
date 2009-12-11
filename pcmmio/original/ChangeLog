@@ -1,5 +1,10 @@
 2009-12-11	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* main_pcmmio_din.c, main_pcmmio_irq.c, pcmmio_shell.c: Report time
+	between discrete in interrupts in microseconds.
+
+2009-12-11	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* README: Add section on RTEMS Configuration needed by driver.
 	* mio_io_rtems.c: Switch to using a message queue for transmitting
 	discrete interrupt changes to the task level.

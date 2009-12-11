@@ -19,7 +19,7 @@
 #include <getopt.h>
 
 #if defined(TESTING)
-  #define dio_read_bit(_x) (_x & 1)
+  #define dio_read_bit(_x) ((_x) & 1)
 #endif
 
 void pcmmio_dio_read(

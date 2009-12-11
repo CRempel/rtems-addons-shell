@@ -14,6 +14,7 @@
 #include "pcmmio_commands.h"
 #include "mio_io.h"
 #include <rtems/stringto.h>
+#include <stdint.h>
 
 #define __need_getopt_newlib
 #include <getopt.h>
@@ -25,6 +26,45 @@ char pcmmio_irq_usage[] =
 
 #define PRINT_USAGE() \
    printf( pcmmio_irq_usage, argv[0] )
+
+/*
+ *  pc386 BSP provided variables.
+ */
+extern uint64_t pc586_tsc_per_tick;
+extern uint64_t pc586_nanoseconds_per_tick;
+
+/*
+ *  Compute the number of TSC clicks per microsecond.
+ */ 
+uint64_t tsc_per_microsecond()
+{
+  static uint64_t pcmmio_tsc_per_microsecond = 0;
+
+  if ( pcmmio_tsc_per_microsecond == 0 ) {
+    pcmmio_tsc_per_microsecond =
+      (pc586_tsc_per_tick * 1000) / pc586_nanoseconds_per_tick;
+  }
+
+  return pcmmio_tsc_per_microsecond;
+}
+
+/*
+ *  Subtract two timestamps from the PCMMIO driver and convert that to 
+ *  microseconds.
+ */ 
+int din_timestamp_subtract(
+  uint64_t previousTimestamp,
+  uint64_t timestamp
+)
+{
+  uint64_t cycles;
+
+  if ( previousTimestamp == 0 )
+    return 0;
+
+  cycles = timestamp - previousTimestamp;
+  return (int) (cycles  / tsc_per_microsecond());
+}
 
 int main_pcmmio_irq(int argc, char **argv)
 {
@@ -45,7 +85,8 @@ int main_pcmmio_irq(int argc, char **argv)
   const char         *irq = "";
   int                 elapsed;
   int                 interrupts;
-  unsigned long long  timestamp;
+  uint64_t            previousTimestamp = 0;
+  uint64_t            timestamp;
 
   /*
    * Parse arguments here
@@ -176,10 +217,19 @@ int main_pcmmio_irq(int argc, char **argv)
 
     if ( sc != -1 ) {
       interrupts++;
-      if ( do_din == true )
-        printf( "%d %s irq pin %d @ %llx\n", elapsed, irq, sc - 1, timestamp );
-      else
+      if ( do_din == true ) {
+        printf(
+          "%d %s irq pin %d @ %llx (%d usecs since last)\n",
+          elapsed,
+          irq,
+          sc - 1,
+          timestamp,
+          din_timestamp_subtract( previousTimestamp, timestamp )
+        );
+        previousTimestamp = timestamp;
+      } else {
         printf( "%d %s irq\n", elapsed, irq );
+      }
     }
 
     elapsed += milliseconds;
