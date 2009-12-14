@@ -22,13 +22,15 @@ extern rtems_shell_cmd_t Shell_PCMMIO_DOUT_Command;
 extern rtems_shell_cmd_t Shell_PCMMIO_ADC_Command;
 extern rtems_shell_cmd_t Shell_PCMMIO_DAC_Command;
 extern rtems_shell_cmd_t Shell_PCMMIO_IRQ_Command;
+extern rtems_shell_cmd_t Shell_PCMMIO_Benchmark_Command;
 
 #define CONFIGURE_PCMMIO_COMMANDS \
   &Shell_PCMMIO_DIN_Command, \
   &Shell_PCMMIO_DOUT_Command, \
   &Shell_PCMMIO_ADC_Command, \
   &Shell_PCMMIO_DAC_Command, \
-  &Shell_PCMMIO_IRQ_Command
+  &Shell_PCMMIO_IRQ_Command, \
+  &Shell_PCMMIO_Benchmark_Command \
 
 extern rtems_shell_alias_t Shell_PCMMIO_DIN_Alias;
 extern rtems_shell_alias_t Shell_PCMMIO_DOUT_Alias;

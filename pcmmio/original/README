@@ -97,6 +97,12 @@ pcmmio_irq - Wait for PCMMIO IRQs
 
   You select one of the three IRQ sources to monitor.
 
+pcmmio_benchmark - Benchmark Discrete Input Interrupt Performance
+
+  pcmmio_benchmarks [-i interrupts] [-v]
+
+  Where: maximum interrupts must be >= 1
+
 Aliases
   + adc  - alias for pcmmio_adc 
   + dac  - alias for pcmmio_dac 

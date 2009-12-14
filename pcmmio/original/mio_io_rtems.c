@@ -720,9 +720,6 @@ void common_handler(void)
       /* Clear the interrupt */
       clr_int(int_num);
     }
-
-    /* Wake up anybody waiting for a DIO interrupt */
-    wake_up_interruptible(&wq_dio);
   }
 
   if (status & 0x10) {

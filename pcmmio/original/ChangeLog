@@ -1,3 +1,9 @@
+2009-12-14	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, README, mio_io_rtems.c, pcmmio_commands.h: Add command to
+	benchmark discrete input including message queue send and receive.
+	* main_pcmmio_benchmark.c: New file.
+
 2009-12-11	Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* mio_io_rtems.c: Ensure mio_error_code is properly initialized to
