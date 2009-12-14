@@ -1,5 +1,9 @@
 2009-12-14	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* mio_io_rtems.c: Make internal routines static.
+
+2009-12-14	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* Makefile, README, mio_io_rtems.c, pcmmio_commands.h: Add command to
 	benchmark discrete input including message queue send and receive.
 	* main_pcmmio_benchmark.c: New file.

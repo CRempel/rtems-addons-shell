@@ -30,12 +30,12 @@ static unsigned short irq = 0;
 static unsigned short base_port = 0;
 
 /* Function prototypes for local functions */
-int get_buffered_int(
+static int get_buffered_int(
   unsigned long long *timestamp
 );
-void init_io(unsigned short io_address);
-void clr_int(int bit_number);
-int get_int(void);
+static void init_io(unsigned short io_address);
+static void clr_int(int bit_number);
+static int get_int(void);
 
 /* RTEMS Ids for Wait Queues */
 rtems_id wq_a2d_1;
