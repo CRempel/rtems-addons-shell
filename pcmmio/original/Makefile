@@ -2,7 +2,7 @@
 #  $Id$
 #
 
-RTEMS_MAKEFILE_PATH=/home/joel/rtems-4.10-work/bsp-install/i386-rtems4.10/pc386/
+RTEMS_MAKEFILE_PATH=/users/joel/centaur/bsp-install/i386-rtems4.10/pc386/
 #
 #  RTEMS_MAKEFILE_PATH is typically set in an environment variable
 #
