@@ -424,11 +424,15 @@ int wait_dio_int_with_timestamp(
     RTEMS_DEFAULT_OPTIONS,
     RTEMS_MILLISECONDS_TO_TICKS(milliseconds)
   );
-  if ( rc == RTEMS_UNSATISFIED )
+  if ( rc == RTEMS_UNSATISFIED ) {
+    mio_error_code = MIO_TIMEOUT_ERROR;
     return -1;
+  }
 
-  if ( rc == RTEMS_TIMEOUT )
+  if ( rc == RTEMS_TIMEOUT ) {
+    mio_error_code = MIO_READ_DATA_FAILURE;
     return -1;
+  }
 
   if ( rc != RTEMS_SUCCESSFUL ) {
     printk( "wait_dio_int_with_timestamp - error %d\n", rc );

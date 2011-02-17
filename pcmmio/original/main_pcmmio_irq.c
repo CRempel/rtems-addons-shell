@@ -115,7 +115,7 @@ int main_pcmmio_irq(int argc, char **argv)
           return -1;
         }
         if ( milliseconds == 0 ) {
-          printf( "Sampling period (%d) is 0\n", milliseconds );
+          printf( "Sampling period should not be 0\n" );
           PRINT_USAGE();
           return -1;
         }
@@ -181,6 +181,9 @@ int main_pcmmio_irq(int argc, char **argv)
     return -1;
   }
 
+  /*
+   *  Set String to print for IRQ source
+   */
   if ( do_din == true ) {
     irq = "DIN";
   } else if ( do_dac == true ) {
@@ -188,13 +191,18 @@ int main_pcmmio_irq(int argc, char **argv)
   } else if ( do_adc == true ) {
     irq = "ADC";
   }
-  if ( maximum != 1 )
+
+  /*
+   * Give some indication of what we are about to do
+   */
+  if ( maximum != 1 ) {
     printf(
       "Polling for %s IRQ for %d iterations with %d msec period\n",
       irq,
       maximum,
       milliseconds
     );
+  }
 
   /*
    *  Now sample in the loop

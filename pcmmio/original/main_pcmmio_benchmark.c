@@ -40,7 +40,6 @@ uint64_t to_usecs( uint64_t cycles )
 
 int main_pcmmio_benchmark(int argc, char **argv)
 {
-  int                 milliseconds;
   int                 maximum;
   int                 sc;
   char                ch;
@@ -58,12 +57,11 @@ int main_pcmmio_benchmark(int argc, char **argv)
   /*
    * Parse arguments here
    */
-  milliseconds = 1000;
   maximum = 1;
   verbose = false;
 
   memset(&getopt_reent, 0, sizeof(getopt_data));
-  while ((ch = getopt_r(argc, argv, "i:v:", &getopt_reent)) != -1) {
+  while ((ch = getopt_r(argc, argv, "i:v", &getopt_reent)) != -1) {
     switch (ch) {
       case 'i': /* maximum interrupts */
         s = getopt_reent.optarg;
@@ -90,7 +88,7 @@ int main_pcmmio_benchmark(int argc, char **argv)
   printf( "Benchmarking for DIN IRQ for %d interrupts\n", maximum );
 
   /*
-   *  Now sample in the loop
+   *  Now catch interrupts in the loop
    */
   interrupts   = 0;
   min_cycles   = 0xffffffff;
