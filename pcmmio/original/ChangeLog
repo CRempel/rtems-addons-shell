@@ -1,5 +1,10 @@
 2011-02-17	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* .cvsignore, main_pcmmio_adc.c, main_pcmmio_benchmark.c,
+	main_pcmmio_irq.c, pcmmio_commands.h, pcmmio_shell.c: Clean up.
+
+2011-02-17	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* Makefile, main_pcmmio_adc.c, pcmmio_commands.h, pcmmio_shell.c: Add
 	set mode command. Add capability to read a single ADC. Updates from
 	Ada version.
