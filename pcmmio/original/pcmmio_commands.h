@@ -19,6 +19,7 @@ extern int main_pcmmio_din(int argc, char **argv);
 
 extern rtems_shell_cmd_t Shell_PCMMIO_DIN_Command;
 extern rtems_shell_cmd_t Shell_PCMMIO_DOUT_Command;
+extern rtems_shell_cmd_t Shell_PCMMIO_ADC_Mode_Command;
 extern rtems_shell_cmd_t Shell_PCMMIO_ADC_Command;
 extern rtems_shell_cmd_t Shell_PCMMIO_DAC_Command;
 extern rtems_shell_cmd_t Shell_PCMMIO_IRQ_Command;
@@ -28,6 +29,7 @@ extern rtems_shell_cmd_t Shell_PCMMIO_Benchmark_Command;
   &Shell_PCMMIO_DIN_Command, \
   &Shell_PCMMIO_DOUT_Command, \
   &Shell_PCMMIO_ADC_Command, \
+  &Shell_PCMMIO_ADC_Mode_Command, \
   &Shell_PCMMIO_DAC_Command, \
   &Shell_PCMMIO_IRQ_Command, \
   &Shell_PCMMIO_Benchmark_Command \
@@ -35,12 +37,14 @@ extern rtems_shell_cmd_t Shell_PCMMIO_Benchmark_Command;
 extern rtems_shell_alias_t Shell_PCMMIO_DIN_Alias;
 extern rtems_shell_alias_t Shell_PCMMIO_DOUT_Alias;
 extern rtems_shell_alias_t Shell_PCMMIO_ADC_Alias;
+extern rtems_shell_alias_t Shell_PCMMIO_ADC_Mode_Alias;
 extern rtems_shell_alias_t Shell_PCMMIO_DAC_Alias;
 
 #define CONFIGURE_PCMMIO_ALIASES \
   &Shell_PCMMIO_DIN_Alias, \
   &Shell_PCMMIO_DOUT_Alias, \
   &Shell_PCMMIO_ADC_Alias, \
+  &Shell_PCMMIO_ADC_Mode_Alias, \
   &Shell_PCMMIO_DAC_Alias
   
 #endif

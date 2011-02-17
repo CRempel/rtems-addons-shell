@@ -1,5 +1,12 @@
 2011-02-17	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* Makefile, main_pcmmio_adc.c, pcmmio_commands.h, pcmmio_shell.c: Add
+	set mode command. Add capability to read a single ADC. Updates from
+	Ada version.
+	* rootfs/set_adc_modes, rootfs/test_adc: New files.
+
+2011-02-17	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* Makefile: Use ${HOME}
 	* main_pcmmio_benchmark.c, main_pcmmio_irq.c: Clean up.
 	* mio_io_rtems.c: Set error code in more cases.

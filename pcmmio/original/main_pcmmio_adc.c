@@ -34,23 +34,29 @@ void pcmmio_adc_read(
 }
 
 void pcmmio_adc_printf(
-  float *adc
+  float *adc,
+  int    channel
 )
 {
   struct timespec ts;
 
   (void) rtems_clock_get_uptime( &ts );
-  printf(
-    "%03ld:%06ld %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f\n" 
-    "%11s%7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f\n",
-    ts.tv_sec, ts.tv_nsec/1000,
-    adc[0], adc[1], adc[2], adc[3], adc[4], adc[5], adc[6], adc[7],
-    "", adc[8], adc[9], adc[10], adc[11], adc[12], adc[13], adc[14], adc[15]
-  );
+  printf( "%03ld:%06ld ", ts.tv_sec, ts.tv_nsec/1000 );
+
+  if ( channel == -1 ) {
+    printf(
+      "%7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f\n" 
+      "%11s%7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f\n",
+      adc[0], adc[1], adc[2], adc[3], adc[4], adc[5], adc[6], adc[7],
+      "", adc[8], adc[9], adc[10], adc[11], adc[12], adc[13], adc[14], adc[15]
+    );
+  } else {
+    printf( "%7.4f\n", adc[channel] );
+  }
 }
 
 char pcmmio_adc_usage[] =
-  "Usage: %s [-i iterations] [-p period] [-v]\n"
+  "Usage: %s [-i iterations] [-p period] [-v] [channel]\n"
   "Where: maximum iterations defaults to 1\n"
   "       the period is in milliseconds and defaults to 1000\n";
 
@@ -62,6 +68,8 @@ int main_pcmmio_adc(int argc, char **argv)
   int                 milliseconds;
   int                 maximum;
   int                 iterations;
+  int                 channel;
+  int                 i;
   char                ch;
   bool                changed;
   bool                verbose;
@@ -74,8 +82,9 @@ int main_pcmmio_adc(int argc, char **argv)
    * Parse arguments here
    */
   milliseconds = 1000;
-  maximum = 1;
-  verbose = false;
+  maximum      = 1;
+  channel      = -1;
+  verbose      = false;
 
   memset(&getopt_reent, 0, sizeof(getopt_data));
   while ((ch = getopt_r(argc, argv, "i:p:v", &getopt_reent)) != -1) {
@@ -112,12 +121,28 @@ int main_pcmmio_adc(int argc, char **argv)
     }
   }
 
-  if ( maximum != 1 )
+  if ( maximum != 1 ) {
     printf(
       "Polling analog inputs for %d iterations with %d msec period\n",
       maximum,
       milliseconds
     );
+  }
+
+  /*
+   *  Is there a specific ADC we are interested in?
+   */
+  i = getopt_reent.optind;
+  if ( i < argc ) {
+    if ( rtems_string_to_int( argv[i], &channel, NULL, 0 ) ) {
+      printf( "ADC (%s) is not a number\n", argv[i] );
+      return -1;
+    }
+    if ( channel < 0 || channel > 15 ) {
+      puts( "ADC number must be 0-15" );
+      return -1;
+    }
+  }
 
   /*
    *  Now sample in the loop
@@ -128,13 +153,17 @@ int main_pcmmio_adc(int argc, char **argv)
   while (1) {
     pcmmio_adc_read(adc_current);
    
-    if ( iterations == 1 )
+    if ( iterations == 1 ) {
       changed = true;
-    else if ( memcmp( adc_last, adc_current, sizeof(adc_current) ) )
-      changed = true;
-    
+    } else if ( channel == -1 ) {
+      if ( memcmp( adc_last, adc_current, sizeof(adc_current) ) )
+	changed = true;
+    } else if ( adc_last[channel] != adc_current[channel] ) {
+       changed = true;
+    } 
+
     if ( verbose || changed ) {
-      pcmmio_adc_printf(adc_current);
+      pcmmio_adc_printf(adc_current, channel);
       memcpy( adc_last, adc_current, sizeof(adc_current) );
       changed = false;
     }

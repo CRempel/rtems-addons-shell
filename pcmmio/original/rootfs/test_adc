@@ -1,0 +1,54 @@
+#! joel
+
+echo "*** assume dac 4 is connected to ADC 0 ***"
+echo "Cycle from -5v to +5v with one second between on dac 4"
+
+pcmmio_dac 4 -5.0
+sleep 1
+pcmmio_adc 0
+
+pcmmio_dac 4 -4.0
+sleep 1
+pcmmio_adc 0
+
+pcmmio_dac 4 -3.0
+sleep 1
+pcmmio_adc 0
+
+pcmmio_dac 4 -2.0
+sleep 1
+pcmmio_adc 0
+
+pcmmio_dac 4 -1.0
+sleep 1
+pcmmio_adc 0
+
+pcmmio_dac 4 0.0
+sleep 1
+pcmmio_adc 0
+
+pcmmio_dac 4 1.0
+sleep 1
+pcmmio_adc 0
+
+pcmmio_dac 4 2.0
+sleep 1
+pcmmio_adc 0
+
+pcmmio_dac 4 3.0
+sleep 1
+pcmmio_adc 0
+
+pcmmio_dac 4 4.0
+sleep 1
+pcmmio_adc 0
+
+pcmmio_dac 4 5.0
+sleep 1
+pcmmio_adc 0
+
+echo "Write 0.0v to dac 4"
+pcmmio_dac 4 0.0
+sleep 1
+pcmmio_adc 0
+

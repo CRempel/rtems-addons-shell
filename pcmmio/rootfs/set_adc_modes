@@ -1,0 +1,3 @@
+#! joel
+echo "Setting all ADCs to +/-10V (bipolar) and single ended"
+pcmmio_adc_mode 0 15

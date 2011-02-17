@@ -11,10 +11,20 @@
 
 #include "pcmmio_commands.h"
 
+#include <stdlib.h>
+
+#include <rtems/untar.h>
+/*
+ *  The tarfile image is built automatically externally.
+ */
+#include "FilesystemImage.h"
+
 rtems_task Init(
   rtems_task_argument ignored
 )
 {
+  int status;
+
   /*
    *  Initialize the PCMMIO module to use IRQ6.  Ours is jumpered for 0x300
    *  base address.  We use discrete input interrupts so enable all of the
@@ -25,6 +35,16 @@ rtems_task Init(
   { int i;
     for (i=1 ; i<=48 ; i++ )
       dio_enab_bit_int(i, 1);
+  }
+
+  /*
+   * Untar initial filesystem contents from program image
+   */
+  printk("Loading filesystem image\n");
+  status = Untar_FromMemory( (char *)FilesystemImage, FilesystemImage_size );
+  if ( status ) {
+    printf("Unable to untar initial filesystem contents\n");
+    exit(0);    
   }
 
   /*
@@ -75,6 +95,9 @@ rtems_task Init(
 #define CONFIGURE_RTEMS_INIT_TASKS_TABLE
 #define CONFIGURE_EXTRA_TASK_STACKS         (6 * RTEMS_MINIMUM_STACK_SIZE)
 #define CONFIGURE_INIT_TASK_ATTRIBUTES      RTEMS_FLOATING_POINT
+
+/* We need the full IMFS to create initial files */
+#define CONFIGURE_USE_IMFS_AS_BASE_FILESYSTEM
 
 #define CONFIGURE_STACK_CHECKER_ENABLED
 #define CONFIGURE_MALLOC_STATISTICS
