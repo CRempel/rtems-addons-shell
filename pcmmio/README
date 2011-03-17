@@ -1,0 +1,110 @@
+#
+#  $Id$
+#
+
+This is a port of the Winsystems Linux driver to RTEMS.
+
+In general, the goal was to minimize changes to the user level
+library and only replace Linux IO calls to the device driver
+with direct access functions. 
+
+The driver uses 4 Classic API Barriers.
+
+--joel sherrill
+
+Issues
+======
++ The library is not reentrant. The GNU/Linux version uses global variables
+  to track the state of certain variables and access to these is not protected.
+  This design flaw is carried over into the RTEMS version.
+
++ We want to timestamp samples and the initial code did not do that.  I
+  added this.
+
+New Methods
+===========
+  void pcmmio_initialize(
+    unsigned short _base_port,
+    unsigned short _irq
+  );
+
+  void flush_buffered_ints(void);
+
+  int wait_adc_int_with_timeout(int adc_num, int milliseconds);
+
+  int wait_dac_int_with_timeout(int dac_num, int milliseconds);
+
+  int wait_dio_int_with_timeout(int milliseconds);
+
+  int wait_dio_int_with_timestamp(
+    int                 milliseconds,
+    unsigned long long *timestamp
+  );
+  int dio_get_missed_interrupts(void);
+
+RTEMS Configuration
+===================
+The driver needs:
+
++ 3 Classic API Barriers
++ 1 Classic API Message Queue
+  - 1024 buffers of sizeof(din_messsage_t) (should be 12 bytes)
+
+The pcmmio_shell example is probably over configured but is a
+working guide.
+
+RTEMS Shell Commands
+====================
+The following RTEMS Shell configuration aids are defined to assist in
+adding PCMMIO related commands to your shell.
+  CONFIGURE_PCMMIO_ALIASES
+  CONFIGURE_PCMMIO_COMMANDS
+
+pcmmio_din - Read Discrete Inputs
+    pcmmio_din [-i iterations] [-p period] [-v]
+    Where: maximum iterations defaults to 1
+           the period is in milliseconds and defaults to 1000
+
+pcmmio_dout - Write a Discrete Output
+    pcmmio_dout bit value
+    Where: bit must be 0-47
+           value must be 0 or 1
+
+pcmmio_adc - Read Analog Inputs
+    pcmmio_adc [-i iterations] [-p period] [-v]
+    Where: maximum iterations defaults to 1
+           the period is in milliseconds and defaults to 1000
+
+pcmmio_dac - Write Analog Output
+    pcmmio_dac dac voltage
+    pcmmio_dac dac low high step time_per_step maximum_time
+
+    Where: dac must be 0-7
+           voltages and step must be -10V to +10V
+           times are in milliseconds
+
+    First form is a single write.
+    Second form writes a pattern.
+
+pcmmio_irq - Wait for PCMMIO IRQs
+  pcmmio_irq [-i iterations] [-p period] [-v] [-d|-D DAC|-a ADC]
+
+  Where: maximum iterations defaults to 1
+         the period is in milliseconds and defaults to 1000
+         -d enables discrete input irq monitoring
+         -D DAC enables irq monitoring on the DAC channel "DAC"
+         -a ADC enables irq monitoring on the ADC channel "ADC"
+
+  You select one of the three IRQ sources to monitor.
+
+pcmmio_benchmark - Benchmark Discrete Input Interrupt Performance
+
+  pcmmio_benchmarks [-i interrupts] [-v]
+
+  Where: maximum interrupts must be >= 1
+
+Aliases
+  + adc  - alias for pcmmio_adc 
+  + dac  - alias for pcmmio_dac 
+  + din  - alias for pcmmio_din 
+  + dout - alias for pcmmio_dout 

@@ -1,0 +1,213 @@
+2009-12-14	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* mio_io_rtems.c: Make internal routines static.
+
+2009-12-14	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, README, mio_io_rtems.c, pcmmio_commands.h: Add command to
+	benchmark discrete input including message queue send and receive.
+	* main_pcmmio_benchmark.c: New file.
+
+2009-12-11	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* mio_io_rtems.c: Ensure mio_error_code is properly initialized to
+	MIO_SUCCESS.
+
+2009-12-11	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* main_pcmmio_din.c, main_pcmmio_irq.c, pcmmio_shell.c: Report time
+	between discrete in interrupts in microseconds.
+
+2009-12-11	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* README: Add section on RTEMS Configuration needed by driver.
+	* mio_io_rtems.c: Switch to using a message queue for transmitting
+	discrete interrupt changes to the task level.
+	* pcmmio_shell.c: Modify application configuration to take into
+	account one less barrier and the new message queue.
+
+2009-12-11	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* README: Add list of new methods.
+	* mio_io.h, mio_io_rtems.c: Add dio_get_missed_interrupts() with
+	no tracking of missed interrupts since will switch to message queues.
+
+2009-10-21	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* main_pcmmio_din.c, main_pcmmio_irq.c: Adjust bit numbering
+	difference.
+
+2009-10-13	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* main_pcmmio_dac.c: Fix help message.
+
+2009-08-13	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* main_pcmmio_dout.c: Fix mismatch in numbering between our view of
+	0-47 and driver's 1-48 view.
+
+2009-08-13	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* main_pcmmio_irq.c, mio_io.h, mio_io_rtems.c: Add ADCs confirmed to
+	work using the dac command. Both single voltages and a pattern were
+	written.
+
+2009-08-12	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, README, main_pcmmio_adc.c, main_pcmmio_dac.c,
+	main_pcmmio_din.c, main_pcmmio_dout.c, mio_io_rtems.c,
+	pcmmio_shell.c: Discrete input polled and interrupt now works.
+
+2009-07-23	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* main_pcmmio_irq.c: Add code to report interrupts.
+
+2009-07-23	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* main_pcmmio_adc.c, main_pcmmio_dac.c, main_pcmmio_din.c,
+	main_pcmmio_dout.c, main_pcmmio_irq.c: Update checks of return status
+	from rtems_string_to_XXX to reflect change to rtems_status_code.
+
+2009-07-22	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, README, main_pcmmio_dac.c, mio_io.h, mio_io_rtems.c,
+	pcmmio_commands.h, pcmmio_shell.c, rtems_config.c: Add pcmmio_irq
+	command and do some cleanup as noticed on other files.
+	* main_pcmmio_irq.c: New file.
+
+2009-07-22	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* README: Fix typo.
+
+2009-07-22	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* README, main_pcmmio_dac.c, rtems_config.c: Add mode to pcmmio_dac
+	command where it can write a pattern.
+
+2009-07-22	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* README, main_pcmmio_adc.c, main_pcmmio_dac.c, main_pcmmio_din.c,
+	main_pcmmio_dout.c, pcmmio_commands.h: Switch to rtems/string2.h
+	methods. Verify negative voltages are allowed as input.
+
+2009-07-21	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, README, main_pcmmio_dac.c, main_pcmmio_dout.c: Added
+	string2XXX routines to RTEMS so we have ability to do heavy error
+	checking on numeric inputs.
+
+2009-07-21	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, README, mio_io.h, pcmmio_commands.h: Add pcmmio_dac
+	command.
+	* main_pcmmio_dac.c: New file.
+
+2009-07-20	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, README, main_pcmmio_din.c, main_pcmmio_dout.c,
+	pcmmio_commands.h: Add initial command to monitor analog inputs.
+	Clean up help and usage.
+	* main_pcmmio_adc.c: New file.
+
+2009-07-20	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* README: Add description of commands.
+	* main_pcmmio_din.c, main_pcmmio_dout.c: Fix usage.
+
+2009-07-20	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, main_pcmmio_din.c, pcmmio_commands.h, pcmmio_shell.c: Add
+	dout command.
+	* main_pcmmio_dout.c: New file.
+
+2009-07-20	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile: Put each command in its own file.
+	* main_pcmmio_din.c: New file.
+	* pcmmio_commands.c: Removed.
+
+2009-07-20	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* pcmmio_commands.c: Clean up command.
+
+2009-07-17	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile: Add dependencies so .exe's are relinked.
+	* mio_io.c: Typo.
+	* pcmmio_commands.c: Basic shell of command works.
+
+2009-07-17	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile: Shell appplication configured with a dummy pcmmio command.
+	* pcmmio_commands.c, pcmmio_commands.h, pcmmio_shell.c: New files.
+
+2009-07-16	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, rtems_config.c: Simple RTEMS Application runs polled. Does
+	not report errors and reports all zeroes on input discretes.
+
+2009-07-10	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* rtems_config.c: Bump POSIX threads.
+
+2009-06-17	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Status: New file.
+
+2009-06-17	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* buffered.c, dacbuff.c, dacout.c, flash.c, getall.c, getvolt.c,
+	kbhit.c, mio_io.c, mio_io_linux.c, mio_io_rtems.c, pcmmio.c, poll.c,
+	repeat.c, rtems_config.c: Clean up. Worked on RTEMS IRQ support code.
+
+2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* mio_io.h, mio_io_rtems.c: Add timestamps to buffered interrupts.
+	* rtems_config.c: Switch to POSIX Initialization thread and up
+	configured pthreads so application can create one.
+
+2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* rtems_config.c: Needs 4 barriers.
+
+2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* README: Document state of the driver.
+	* mio_io.h, mio_io_rtems.c: Move to shared interrupts when possible.
+	* rtems_config.c: Implement the RTEMS configuration and initialization.
+
+2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* mio_io_rtems.c: Initial interrupt support added. Should now be on
+	functional parity with Linux driver but not debugged.
+
+2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* mio_io_rtems.c: All Linux functionality should be implemented now
+	EXCEPT hooking the interrupt.
+
+2009-06-10	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* mio_io_rtems.c: Add checking for interrupt status.
+
+2009-06-08	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, flash.c, mio_io.h: All programs now compile with the copied
+	RTEMS specific porting layer file.
+	* .cvsignore, mio_io_rtems.c: New files.
+
+2009-06-08	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, mio_io.c, mio_io.h: Linux code split to porting file.
+	* mio_io_linux.c: New file.
+
+2009-06-08	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, kbhit.c, mio_io.c, mio_io.h: First successful compilation
+	under RTEMS. Added some Linux ifdef's.
+	* rtems_config.c: New file.
+
+2009-06-08	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* ChangeLog, Makefile.linux, README: New files.
+

@@ -1,0 +1,16 @@
+#
+#  $Id$
+#
+
+Questions
+=========
++ IO Base Address has to be selected and jumpered
+
++ Interrupt is software programmed but must be selected
+
+Debug Issues
+============
++ RTEMS specific interrupt code and initialization is the main
+  area of risk in this driver.  The rest of the code is massaged
+  versions of the GNU/Linux driver.
+
