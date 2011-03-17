@@ -1,0 +1,56 @@
+Index: mio_io_rtems.c
+===================================================================
+RCS file: /home/CVS-Mitre/pcmmio-rtems/mio_io_rtems.c,v
+retrieving revision 1.10
+diff -u -r1.10 mio_io_rtems.c
+--- mio_io_rtems.c	13 Aug 2009 20:49:38 -0000	1.10
++++ mio_io_rtems.c	11 Dec 2009 15:12:44 -0000
+@@ -663,24 +681,34 @@
+       #endif
+ 
+       /*
+-       * Buffer the interrupt
+-       *
+-       * NOTE: No need to worry about disabling interrupts,
+-       *       we are in interrupts.
++       * Ensure there is space to buffer the interrupt
+        */
++      if ( inptr == (outptr-1) || ((inptr == MAX_INTS) && outptr == 0)) {
++        pcmmio_dio_missed_interrupts++;
+ 
+-      int_buffer[inptr].timestamp = rdtsc();
+-      int_buffer[inptr].line = int_num;
+-      inptr++;
+-      if (inptr == MAX_INTS)
+-        inptr = 0;
++	/* Clear the interrupt */
++	clr_int(int_num);
++        /* at last slot */
++      } else {
++        /*
++         * Buffer the interrupt
++         *
++         * NOTE: No need to worry about disabling interrupts,
++         *       we are in interrupts.
++         */
++	int_buffer[inptr].timestamp = rdtsc();
++	int_buffer[inptr].line = int_num;
++	inptr++;
++	if (inptr == MAX_INTS)
++	  inptr = 0;
+ 
+-      /* Clear the interrupt */
+-      clr_int(int_num);
+-    }
++	/* Clear the interrupt */
++	clr_int(int_num);
+ 
+-    /* Wake up anybody waiting for a DIO interrupt */
+-    wake_up_interruptible(&wq_dio);
++        /* Wake up anybody waiting for a DIO interrupt */
++        wake_up_interruptible(&wq_dio);
++      }
++    }
+   }
+ 
+   if (status & 0x10) {
