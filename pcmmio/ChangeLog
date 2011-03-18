@@ -1,5 +1,10 @@
 2011-03-18	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* .cvsignore, Makefile, rootfs/set_adc_modes, rootfs/test_adc: Add root
+	filesystem with test scripts.
+
+2011-03-18	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* Makefile, mio_io.h, mio_io_rtems.c, pcmmio_shell.c, rtems_config.c:
 	Initial implementation.
 	* .cvsignore, multiio_pcmmio.c: New files.
