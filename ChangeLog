@@ -1,0 +1,8 @@
+2011-03-18	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* ChangeLog, Makefile, commands/Makefile, commands/main_multiio_adc.c,
+	commands/main_multiio_benchmark.c, commands/main_multiio_dac.c,
+	commands/main_multiio_din.c, commands/main_multiio_dout.c,
+	commands/main_multiio_irq.c, commands/multiio_commands.h,
+	include/multiio.h, stub/multio_stub.c: New files.
+
