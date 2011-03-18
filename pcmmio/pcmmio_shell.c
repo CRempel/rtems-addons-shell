@@ -1,5 +1,5 @@
 /*
- *  COPYRIGHT (c) 1989-2009.
+ *  COPYRIGHT (c) 1989-2011.
  *  On-Line Applications Research Corporation (OAR).
  *
  *  The license and distribution terms for this file may be
@@ -9,33 +9,25 @@
  *  $Id$
  */
 
-#include "pcmmio_commands.h"
+#include <rtems.h>
+#include <multiio_commands.h>
+#include <multiio.h>
 
 rtems_task Init(
   rtems_task_argument ignored
 )
 {
   /*
-   *  Initialize the PCMMIO module to use IRQ6.  Ours is jumpered for 0x300
-   *  base address.  We use discrete input interrupts so enable all of the
-   *  as edge triggered on 1.
-   */
-  pcmmio_initialize(0x300, 6);
-  enable_dio_interrupt();
-  { int i;
-    for (i=1 ; i<=48 ; i++ )
-      dio_enab_bit_int(i, 1);
-  }
-
-  /*
    *  Display a herald with some hints on usage
    */
   printf(
     "\n"
     "\n"
-    "*** Shell Configured with WinSystems PCMMIO Commands ***\n"
-    "Type \"help pcmmio\" for more information\n"
-    "\n"
+    "*** Shell Configured with Multi IO Commands ***\n"
+    "Multi IO Configuration: %s\n"
+    "Type \"help multiio\" for more information\n"
+    "\n",
+    rtems_multiio_get_name()
   );
   rtems_shell_init(
     "SHLL",                          /* task_name */
@@ -83,9 +75,9 @@ rtems_task Init(
 #include <rtems/confdefs.h>
 
 #define CONFIGURE_SHELL_USER_COMMANDS \
-  CONFIGURE_PCMMIO_COMMANDS
+  CONFIGURE_MULTIIO_COMMANDS
 #define CONFIGURE_SHELL_USER_ALIASES \
-  CONFIGURE_PCMMIO_ALIASES
+  CONFIGURE_MULTIIO_ALIASES
 
 #define CONFIGURE_SHELL_COMMANDS_INIT
 #define CONFIGURE_SHELL_COMMANDS_ALL

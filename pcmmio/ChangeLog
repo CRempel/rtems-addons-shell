@@ -1,3 +1,9 @@
+2011-03-18	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile, mio_io.h, mio_io_rtems.c, pcmmio_shell.c, rtems_config.c:
+	Initial implementation.
+	* .cvsignore, multiio_pcmmio.c: New files.
+
 2009-12-14	Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* mio_io_rtems.c: Make internal routines static.

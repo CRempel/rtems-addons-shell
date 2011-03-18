@@ -31,7 +31,7 @@ static unsigned short base_port = 0;
 
 /* Function prototypes for local functions */
 static int get_buffered_int(
-  unsigned long long *timestamp
+  struct timespec *timestamp
 );
 static void init_io(unsigned short io_address);
 static void clr_int(int bit_number);
@@ -52,8 +52,8 @@ rtems_id wq_dio;
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef struct {
-  unsigned long long timestamp;
-  int                pin;
+  struct timespec timestamp;
+  int             pin;
 } din_message_t;
 
 unsigned int pcmmio_dio_missed_interrupts;
@@ -339,7 +339,7 @@ unsigned short adc_read_conversion_data(int channel)
 
 
 int dio_get_int_with_timestamp(
-  unsigned long long *timestamp
+  struct timespec *timestamp
 )
 {
   mio_error_code = MIO_SUCCESS;
@@ -404,8 +404,8 @@ int wait_dac_int(int dac_num)
 }
 
 int wait_dio_int_with_timestamp(
-  int                 milliseconds,
-  unsigned long long *timestamp
+  int              milliseconds,
+  struct timespec *timestamp
 )
 {
   rtems_status_code  rc;
@@ -650,8 +650,6 @@ void pcmmio_initialize(
   }
 }
 
-#include <libcpu/cpuModel.h> /* for rdtsc */
-
 /*
  *  From this point down, we should be able to share easily with the Linux
  *  driver but I haven't gone to the trouble to do surgery on it.  I have
@@ -708,8 +706,8 @@ void common_handler(void)
       rtems_status_code  rc;
       din_message_t      din;
 
-      din.timestamp = rdtsc(); 
-      din.pin       = int_num; 
+      rtems_clock_get_uptime( &din.timestamp );
+      din.pin = int_num; 
 
       rc = rtems_message_queue_send( wq_dio, &din, sizeof(din_message_t) );
       if ( rc != RTEMS_SUCCESSFUL ) {
@@ -860,7 +858,7 @@ void flush_buffered_ints(void)
 }
 
 int get_buffered_int(
-  unsigned long long *timestamp
+  struct timespec *timestamp
 )
 {
   rtems_status_code  rc;
