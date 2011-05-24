@@ -1,3 +1,7 @@
+2011-05-24	Jennifer Averett <Jennifer.Averett@OARcorp.com>
+
+	* include/adc.h: New file.
+
 2011-03-18	Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* ChangeLog, Makefile, commands/Makefile, commands/main_multiio_adc.c,
