@@ -1,0 +1,17 @@
+#
+#  $Id$
+#
+
+Run the following commands:
+
+cd include
+doxygen
+
+Output is in doxy/html and doxy/latex.
+Warnings are in doxy_warnings.txt
+
+To generate PDF
+
+make -C doxy/latex pdf
+
+output is in doxy/latex/refman.pdf
