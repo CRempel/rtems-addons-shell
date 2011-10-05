@@ -31,11 +31,13 @@ static unsigned short base_port = 0;
 
 /* Function prototypes for local functions */
 static int get_buffered_int(
-  unsigned long long *timestamp
+  struct timespec *timestamp
 );
 static void init_io(unsigned short io_address);
 static void clr_int(int bit_number);
 static int get_int(void);
+
+int report_dio_ints(void);
 
 /* RTEMS Ids for Wait Queues */
 rtems_id wq_a2d_1;
@@ -52,8 +54,8 @@ rtems_id wq_dio;
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef struct {
-  unsigned long long timestamp;
-  int                pin;
+  struct timespec timestamp;
+  int             pin;
 } din_message_t;
 
 unsigned int pcmmio_dio_missed_interrupts;
@@ -339,7 +341,7 @@ unsigned short adc_read_conversion_data(int channel)
 
 
 int dio_get_int_with_timestamp(
-  unsigned long long *timestamp
+  struct timespec *timestamp
 )
 {
   mio_error_code = MIO_SUCCESS;
@@ -404,8 +406,8 @@ int wait_dac_int(int dac_num)
 }
 
 int wait_dio_int_with_timestamp(
-  int                 milliseconds,
-  unsigned long long *timestamp
+  int              milliseconds,
+  struct timespec *timestamp
 )
 {
   rtems_status_code  rc;
@@ -425,12 +427,12 @@ int wait_dio_int_with_timestamp(
     RTEMS_MILLISECONDS_TO_TICKS(milliseconds)
   );
   if ( rc == RTEMS_UNSATISFIED ) {
-    mio_error_code = MIO_TIMEOUT_ERROR;
+    mio_error_code = MIO_READ_DATA_FAILURE;
     return -1;
   }
 
   if ( rc == RTEMS_TIMEOUT ) {
-    mio_error_code = MIO_READ_DATA_FAILURE;
+    mio_error_code = MIO_TIMEOUT_ERROR;
     return -1;
   }
 
@@ -535,6 +537,8 @@ int interruptible_sleep_on(
   rc = rtems_barrier_wait(*id, RTEMS_MILLISECONDS_TO_TICKS(milliseconds));
   if ( rc == RTEMS_SUCCESSFUL )
     return 0;
+
+  mio_error_code = MIO_TIMEOUT_ERROR;
   return -1;
 }
 
@@ -542,10 +546,9 @@ void wake_up_interruptible(
   rtems_id *id
 )
 {
-  rtems_status_code rc;
-  uint32_t          unblocked;
+  uint32_t  unblocked;
 
-  rc = rtems_barrier_release(*id, &unblocked);
+  (void) rtems_barrier_release(*id, &unblocked);
 }
 
 /*
@@ -635,6 +638,13 @@ void pcmmio_initialize(
   /* install IRQ handler */
   if ( base_port && irq ) {
     int status = 0;
+
+    /*
+     *  Process any pending interrupts
+     */
+
+    common_handler();
+
     pcmmio_irq.name = irq;
     #if defined(BSP_SHARED_HANDLER_SUPPORT)
       printk( "PCMMIO Installing IRQ handler as shared\n" );
@@ -648,8 +658,6 @@ void pcmmio_initialize(
     }
   }
 }
-
-#include <libcpu/cpuModel.h> /* for rdtsc */
 
 /*
  *  From this point down, we should be able to share easily with the Linux
@@ -667,14 +675,16 @@ extern unsigned char adc2_port_image;
 void common_handler(void)
 {
   unsigned char status;
+#if 0
   unsigned char int_num;
+#endif
 
   /* Read the interrupt ID register from ADC2 */
-
   adc2_port_image = adc2_port_image | 0x20;
   outb(adc2_port_image,base_port + 0x0f);
 
   status = inb(base_port + 0x0f);
+#if !defined(PCMMIO_DISABLE_ADC_IRQ)
   if (status & 1) {
     /* Clear ADC1 interrupt */
     inb(base_port+1);      /* Clear interrupt */
@@ -698,16 +708,21 @@ void common_handler(void)
     /* Wake up if you're waiting on DAC1 */
     wake_up_interruptible(&wq_dac_1);
   }
+#endif
 
   if (status & 8) {
 
+#if 1
+    report_dio_ints();
+#else
     /* DIO interrupt. Find out which bit */
-    while ((int_num = get_int()) != 0) {
+    int_num = get_int();
+    if (int_num) {
       rtems_status_code  rc;
       din_message_t      din;
 
-      din.timestamp = rdtsc(); 
-      din.pin       = int_num; 
+      rtems_clock_get_uptime( &din.timestamp );
+      din.pin = int_num; 
 
       rc = rtems_message_queue_send( wq_dio, &din, sizeof(din_message_t) );
       if ( rc != RTEMS_SUCCESSFUL ) {
@@ -723,6 +738,7 @@ void common_handler(void)
       /* Clear the interrupt */
       clr_int(int_num);
     }
+#endif
   }
 
   if (status & 0x10) {
@@ -845,6 +861,104 @@ int get_int(void)
   return 0;
 }
 
+void report_dio_interrupt(
+  din_message_t   *din,
+  int              pin
+)
+{
+  rtems_status_code  rc;
+
+  din->pin = pin; 
+
+  rc = rtems_message_queue_send( wq_dio, &din, sizeof(din_message_t) );
+  if ( rc != RTEMS_SUCCESSFUL ) {
+    pcmmio_dio_missed_interrupts++;
+    #ifdef DEBUG
+      printk("<1>Missed DIO interrupt\n" );
+    #endif
+ }
+ #ifdef DEBUG
+   printk("<1>Buffering DIO interrupt on bit %d\n",int_num);
+ #endif
+
+  /* Clear the interrupt */
+  clr_int(pin);
+}
+
+int report_dio_ints(void)
+{
+  int                temp;
+  int                x;
+  unsigned short     dio_port;
+  din_message_t      din;
+  bool               found = false;
+
+  rtems_clock_get_uptime( &din.timestamp );
+  /* din.pin set in report_dio_interrupts() */
+
+  dio_port = base_port + 0x10;
+
+  /* Read the master interrupt pending register,
+           mask off undefined bits */
+  temp = inb(dio_port+6) & 0x07;
+
+  /* If there are no pending interrupts, return 0 */
+  if ((temp & 7) == 0)
+    return 0;
+
+  /* There is something pending, now we need to identify it */
+
+  /* Set access to page 3 for interrupt id register */
+  outb(0xc0, dio_port + 7);
+
+  /* Read the interrupt ID register for port 0 */
+  temp = inb(dio_port+8);
+
+  /* See if any bit set, if so return the bit number */
+  for (x=0; temp && x<=7; x++) {
+    if (temp & (1 << x)) {
+      outb(0,dio_port+7);
+      report_dio_interrupt( &din, x+1 );
+      found = true;
+      temp &= ~(1 << x);
+    }
+  }
+
+  /* Now check port 0, read port 1 interrupt ID register */
+  temp = inb(dio_port+9);
+
+  /* See if any bit set, if so return the bit number */
+  for (x=0; temp && x<=7; x++) {
+    if (temp & (1 << x)) {
+      outb(0,dio_port+7);
+      report_dio_interrupt( &din, x+9 );
+      found = true;
+      temp &= ~(1 << x);
+    }
+  }
+
+  /* Now read the status of port 2 interrupt ID register */
+  temp = inb(dio_port+0x0a);
+
+  /* If any pending, return the appropriate bit number */
+  for (x=0; temp && x<=7; x++) {
+    if (temp & (1 << x)) {
+      outb(0,dio_port+7);
+      report_dio_interrupt( &din, x+17 );
+      temp &= ~(1 << x);
+      found = true;
+    }
+  }
+
+  /* We should never get here unless the hardware is seriously
+     misbehaving, but just to be sure, we'll turn the page access
+     back to 0 and return a 0 for no interrupt found
+  */
+  if ( !found )
+    outb(0,dio_port+7);
+  return 0;
+}
+
 void flush_buffered_ints(void)
 {
   rtems_status_code  rc;
@@ -858,7 +972,7 @@ void flush_buffered_ints(void)
 }
 
 int get_buffered_int(
-  unsigned long long *timestamp
+  struct timespec *timestamp
 )
 {
   rtems_status_code  rc;
@@ -880,8 +994,10 @@ int get_buffered_int(
     RTEMS_NO_WAIT,
     0
   );
-  if ( rc == RTEMS_UNSATISFIED )
+  if ( rc == RTEMS_UNSATISFIED ) {
+    mio_error_code = MIO_READ_DATA_FAILURE;
     return 0;
+  }
 
   if ( rc != RTEMS_SUCCESSFUL ) {
     printk( "get_buffered_int - error %d\n", rc );

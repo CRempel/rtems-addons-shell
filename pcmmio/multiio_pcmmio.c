@@ -111,9 +111,7 @@ int rtems_din_wait_interrupt_with_timestamp(
   struct timespec   *timestamp
 )
 {
-  rtems_status_code sc;
-
-  sc = wait_dio_int_with_timestamp(milliseconds, timestamp);
+  (void) wait_dio_int_with_timestamp(milliseconds, timestamp);
   return 0;
 }
 
