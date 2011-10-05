@@ -1,5 +1,9 @@
 2011-10-05	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* Makefile: Add RTD6425.
+
+2011-10-05	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* Makefile: Update to new location.
 	* include/.cvsignore: New file.
 
