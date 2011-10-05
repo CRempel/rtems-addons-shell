@@ -1,3 +1,8 @@
+2011-10-05	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* Makefile: Update to new location.
+	* include/.cvsignore: New file.
+
 2011-05-24	Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* README.doxygen, include/Doxyfile, include/mainpage.h: New files.
