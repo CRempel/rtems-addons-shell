@@ -31,7 +31,7 @@ static unsigned short base_port = 0;
 
 /* Function prototypes for local functions */
 static int get_buffered_int(
-  struct timespec *timestamp
+  unsigned long long *timestamp
 );
 static void init_io(unsigned short io_address);
 static void clr_int(int bit_number);
@@ -52,8 +52,8 @@ rtems_id wq_dio;
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef struct {
-  struct timespec timestamp;
-  int             pin;
+  unsigned long long timestamp;
+  int                pin;
 } din_message_t;
 
 unsigned int pcmmio_dio_missed_interrupts;
@@ -339,7 +339,7 @@ unsigned short adc_read_conversion_data(int channel)
 
 
 int dio_get_int_with_timestamp(
-  struct timespec *timestamp
+  unsigned long long *timestamp
 )
 {
   mio_error_code = MIO_SUCCESS;
@@ -404,8 +404,8 @@ int wait_dac_int(int dac_num)
 }
 
 int wait_dio_int_with_timestamp(
-  int              milliseconds,
-  struct timespec *timestamp
+  int                 milliseconds,
+  unsigned long long *timestamp
 )
 {
   rtems_status_code  rc;
@@ -425,12 +425,12 @@ int wait_dio_int_with_timestamp(
     RTEMS_MILLISECONDS_TO_TICKS(milliseconds)
   );
   if ( rc == RTEMS_UNSATISFIED ) {
-    mio_error_code = MIO_READ_DATA_FAILURE;
+    mio_error_code = MIO_TIMEOUT_ERROR;
     return -1;
   }
 
   if ( rc == RTEMS_TIMEOUT ) {
-    mio_error_code = MIO_TIMEOUT_ERROR;
+    mio_error_code = MIO_READ_DATA_FAILURE;
     return -1;
   }
 
@@ -535,8 +535,6 @@ int interruptible_sleep_on(
   rc = rtems_barrier_wait(*id, RTEMS_MILLISECONDS_TO_TICKS(milliseconds));
   if ( rc == RTEMS_SUCCESSFUL )
     return 0;
-
-  mio_error_code = MIO_TIMEOUT_ERROR;
   return -1;
 }
 
@@ -544,9 +542,10 @@ void wake_up_interruptible(
   rtems_id *id
 )
 {
-  uint32_t  unblocked;
+  rtems_status_code rc;
+  uint32_t          unblocked;
 
-  (void) rtems_barrier_release(*id, &unblocked);
+  rc = rtems_barrier_release(*id, &unblocked);
 }
 
 /*
@@ -650,6 +649,8 @@ void pcmmio_initialize(
   }
 }
 
+#include <libcpu/cpuModel.h> /* for rdtsc */
+
 /*
  *  From this point down, we should be able to share easily with the Linux
  *  driver but I haven't gone to the trouble to do surgery on it.  I have
@@ -701,13 +702,12 @@ void common_handler(void)
   if (status & 8) {
 
     /* DIO interrupt. Find out which bit */
-    int_num = get_int();
-    if (int_num) {
+    while ((int_num = get_int()) != 0) {
       rtems_status_code  rc;
       din_message_t      din;
 
-      rtems_clock_get_uptime( &din.timestamp );
-      din.pin = int_num; 
+      din.timestamp = rdtsc(); 
+      din.pin       = int_num; 
 
       rc = rtems_message_queue_send( wq_dio, &din, sizeof(din_message_t) );
       if ( rc != RTEMS_SUCCESSFUL ) {
@@ -858,7 +858,7 @@ void flush_buffered_ints(void)
 }
 
 int get_buffered_int(
-  struct timespec *timestamp
+  unsigned long long *timestamp
 )
 {
   rtems_status_code  rc;
@@ -880,10 +880,8 @@ int get_buffered_int(
     RTEMS_NO_WAIT,
     0
   );
-  if ( rc == RTEMS_UNSATISFIED ) {
-    mio_error_code = MIO_READ_DATA_FAILURE;
+  if ( rc == RTEMS_UNSATISFIED )
     return 0;
-  }
 
   if ( rc != RTEMS_SUCCESSFUL ) {
     printk( "get_buffered_int - error %d\n", rc );

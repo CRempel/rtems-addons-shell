@@ -1352,6 +1352,14 @@ unsigned char mask;
 
 	temp = read_dio_byte(port);
 
+        // Temporarily clear only our enable. This clears the interrupt
+
+        temp = temp & ~mask;
+
+        // Write out the temporary value
+
+        write_dio_byte(port, temp);
+
 	// Set the enable bit for our bit number
 
 	temp = temp | mask;

@@ -1,3 +1,7 @@
+2011-10-05	Cindy Cicalese <cicalese@mitre.org>
+
+	* mio_io.c, mio_io.h, mio_io_rtems.c: Updates after testing in lab.
+
 2011-03-18	Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* .cvsignore, Makefile, rootfs/set_adc_modes, rootfs/test_adc: Add root
