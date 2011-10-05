@@ -1,0 +1,5 @@
+2011-10-05	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* .cvsignore, ChangeLog, Makefile, multiio_rtd6425.c, rtd6425.c,
+	rtd6425.h: New files.
+
