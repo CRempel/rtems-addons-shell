@@ -142,6 +142,8 @@ extern float adc_offset[16];
 
 #endif
 
+#include <sys/types.h>
+
 /* part of the porting layer */
 int check_handle(void);
 int mio_read_irq_assigned(void);
@@ -185,13 +187,14 @@ int dio_disab_bit_int(int bit_number);
 int dio_clr_int(int bit_number);
 int dio_get_int(void);
 int dio_get_int_with_timestamp(
-  unsigned long long *timestamp
+  struct timespec *timestamp
 );
 int wait_adc_int(int adc_num);
 int wait_dac_int(int dac_num);
 int wait_dio_int(void);
 
 #if defined(__rtems__)
+
   void pcmmio_initialize(
     unsigned short _base_port,
     unsigned short _irq
@@ -202,8 +205,8 @@ int wait_dio_int(void);
   int wait_dac_int_with_timeout(int dac_num, int milliseconds);
   int wait_dio_int_with_timeout(int milliseconds);
   int wait_dio_int_with_timestamp(
-    int                 milliseconds,
-    unsigned long long *timestamp
+    int              milliseconds,
+    struct timespec *timestamp
   );
   int dio_get_missed_interrupts(void);
 #endif

@@ -1,5 +1,9 @@
 2011-10-05	Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* mio_io.h: Clean up.
+
+2011-10-05	Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* mio_io_rtems.c, multiio_pcmmio.c: Rework interrupt handler to reduce
 	overhead per pin change.
 
