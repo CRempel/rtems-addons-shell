@@ -1,0 +1,5 @@
+2011-10-05	Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* .cvsignore, ChangeLog, Makefile, rtd6425_shell.c,
+	rootfs/set_adc_modes, rootfs/test_adc: New files.
+
